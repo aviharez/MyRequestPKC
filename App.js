@@ -26,7 +26,7 @@ const userInfo = {username: 'admin', password: 'admin'};
 class AuthLoadingScreen extends Component {
     constructor(props) {
         super(props);
-        this._loadData();
+		this._loadData();
     }
 
     render() {
@@ -46,7 +46,7 @@ class AuthLoadingScreen extends Component {
 
     _loadData = async () => {
         const logged = await AsyncStorage.getItem('logged');
-        this.props.navigation.navigate('auth');
+        this.props.navigation.navigate(logged ? 'app' : 'auth');
     }
 }
 

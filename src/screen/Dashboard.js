@@ -21,6 +21,7 @@ import img from '../../assets/images/banner-bg.jpg';
 import Card from '../component/Card';
 
 import {style} from '../../assets/styles/Style';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const {width: WIDTH} = Dimensions.get('window');
 

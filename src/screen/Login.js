@@ -24,6 +24,7 @@ import logo from '../../assets/images/logo.png';
 import bg from '../../assets/images/brainstorming-campaign-collaborate-6224.jpg';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Txt, TxtBold} from '../component/Text';
+import {host} from '../config/ApiHost';
 
 // Page import
 import Router from '../Router.js';
@@ -34,19 +35,20 @@ const {width: WIDTH} = Dimensions.get('window');
 
 class SignInBtn extends Component {
 	render() {
+		const {signInStatus, ...restProps} = this.props;
 		if (Platform.OS === 'android') {
 			return (
-				<TouchableNativeFeedback {...this.props}>
+				<TouchableNativeFeedback {...restProps}>
 					<View style={s.signInBtn}>
-						<TxtBold style={s.signInBtnTxt}>Sign In</TxtBold>
+						<TxtBold style={s.signInBtnTxt}>{signInStatus}</TxtBold>
 					</View>
 				</TouchableNativeFeedback>
 			);
 		} else {
 			return (
-				<TouchableHighlight {...this.props}>
+				<TouchableHighlight {...restProps}>
 					<View style={s.signInBtn}>
-						<TxtBold style={s.signInBtnTxt}>Sign In</TxtBold>
+						<TxtBold style={s.signInBtnTxt}>{signInStatus}</TxtBold>
 					</View>
 				</TouchableHighlight>
 			);
@@ -60,13 +62,61 @@ export default class LoginPage extends Component {
 
 		this.state = {
 			isPasswordVisible: false,
-			username: '',
-			password: ''
+			username: null,
+			password: null,
+			signInStatus: 'Sign In',
+			isMounted: false,
 		}
+	}
+
+	componentDidMount() {
+		this.setState({isMounted: true});
+	}
+
+	componentWillUnmount() {
+		this.setState({isMounted: false});
 	}
 
 	static navigationOption = {
 		header: null
+	}
+
+	proceedLogin = async () => {
+		if ((this.state.username == '' || this.state.username == null) || (this.state.password == '' || this.state.password == null)) {
+			alert('Masih kosong itu woi');
+			return;
+		}
+
+		this.setState({signInStatus: 'Processing...'});
+		let response = await fetch(host + 'api/auth', {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({
+				nikSap: this.state.username,
+				password: this.state.password,
+			})
+		});
+		response = await response.json();
+
+		if (response.status == 'success') {
+			await AsyncStorage.multiSet([
+				['logged', 'yes'],
+				['nikSap', response.nikSap],
+				['unitId', response.unitId],
+				['isUnitHead', response.isUnitHead]
+			]);
+			this.props.navigation.navigate('app');
+		} else if (response.status == 'wrongNikSap') {
+			alert('Nik SAP anda salah, silakan periksa kembali');
+			this.setState({username: null});
+		} else if (response.status == 'wrongPassword') {
+			alert('Password anda salah, silakan periksa kembali');
+			this.setState({password: null});
+		}
+
+		this.setState({signInStatus: 'Sign In'});
 	}
 
 	render() {
@@ -120,45 +170,11 @@ export default class LoginPage extends Component {
 						</TouchableOpacity>
 					</View>
 
-					<SignInBtn onPress={() => navigate('app')} />
+					<SignInBtn onPress={this.proceedLogin} signInStatus={this.state.signInStatus} />
 				</View>
 			</ImageBackground>
 		);
 	}
-
-	// _signIn = async () => {
-	// 	let response = await fetch('http://192.168.56.102/spokApi/apicontroller/checkLogin', {
-    //         method: 'POST',
-    //         headers: {
-    //             Accept: 'application/json',
-    //             'Content-Type': 'application/json',
-    //         },
-    //         body: JSON.stringify({
-    //             username: this.state.username,
-    //             password: this.state.password,
-    //         }),
-    //     });
-	// 	const json = await response.json();
-
-	// 	// alert(json.status);
-	// 	if (json.status === 'success') {
-	// 		let username = json.data.username;
-	// 		let kd_biaya = username.substr(3);
-
-	// 		response = await fetch('http://192.168.56.102/spokApi/apicontroller/getIdExecutor/' + kd_biaya);
-	// 		const json2 = await response.json();
-
-	// 		await AsyncStorage.multiSet([
-	// 			['logged', 'yes'], 
-	// 			['username', username], 
-	// 			['unitKerja', json.data.unit_name],
-	// 			['idExecutor', json2.id]
-	// 		]);
-	// 		this.props.navigation.navigate('app');
-	// 	} else {
-	// 		alert('Username atau password salah');
-	// 	}
-	// }
 	
 }
 
