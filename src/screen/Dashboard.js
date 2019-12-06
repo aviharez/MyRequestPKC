@@ -10,15 +10,18 @@ import {
     FlatList,
     ImageBackground,
     TextInput,
-    Dimensions
+    Dimensions,
+    ActivityIndicator
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Feather';
 
 import bg from '../../assets/images/dashboard-bg.jpg';
 import img from '../../assets/images/banner-bg.jpg';
+import {host} from '../config/ApiHost';
 
 import Card from '../component/Card';
+import {Txt} from '../component/Text';
 
 import {style} from '../../assets/styles/Style';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -94,21 +97,45 @@ export default class Dashboard extends Component {
                 'ATK',
                 'Lainnya',
             ],
+            latestRequest: null,
             refreshing: false,
         }
     }
 
     componentDidMount() {
         this._isMounted = true;
+        this.getLatestRequest();
+        this.focusListener = [
+            this.props.navigation.addListener('didFocus', () => {
+                this.getLatestRequest()
+            }),
+            this.props.navigation.addListener('willBlur', () => {
+                this.setState({latestRequest: null});
+            })
+        ];
     }
 
     componentWillUnmount() {
         this._isMounted = false;
+        this.focusListener.forEach(listener => listener.remove());
+    }
+
+    getLatestRequest = async () => {
+        try {
+            this.setState({refreshing: true});
+            const nikSap = await AsyncStorage.getItem('nikSap');
+            let response = await fetch(host + 'api/getMyOrderPok/' + nikSap + '/5');
+            response = await response.json();
+            this.setState({latestRequest: response, refreshing: false});
+        } catch (err) {
+            console.log(err);
+            alert('Gagal mendapatkan request terbaru, periksa koneksi internet anda');
+        }
     }
     
     render() {
 
-        const LatestRequest = ({unit_name, title, status}) => {
+        const LatestRequest = ({unitName, deskripsi, status, date}) => {
 
             const statusBadgeBg = () => {
                 if (status == 'E') {
@@ -122,16 +149,30 @@ export default class Dashboard extends Component {
                 }
             }
 
+            const dateFormat = (date) => {
+                const months = ["Jan", "Feb", "Mar","Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"]
+                let requestDate = date.substr(0, 10)
+                requestDate = requestDate.split('-')
+                let newDate = new Date(
+                    parseInt(requestDate[0]),
+                    parseInt(requestDate[1]) - 1,
+                    parseInt(requestDate[2])
+                );
+                let formattedDate = months[newDate.getMonth()] + " " + newDate.getDate() + ", " + newDate.getFullYear()
+
+                return formattedDate;
+            }
+
             return (
                 <View style={{width: 200, justifyContent: 'center', backgroundColor: 'transparent',}}>
                     <Card style={[style.bgPrimary, s.requestTiles]}>
                         <TouchableOpacity>
                             <View style={{backgroundColor: 'transparent', flexDirection: 'row',}}>
-                                <Text style={[statusBadgeBg(), s.requestStatusBadge,]}>{status}</Text>
-                                <Text category='s2' style={{color: '#222B45', marginTop: 2, width: 130}} numberOfLines={1}>{unit_name}</Text>
+                                <Txt style={[statusBadgeBg(), s.requestStatusBadge,]}>{status}</Txt>
+                                <Txt category='s2' style={{color: '#222B45', marginTop: 2, width: 130}} numberOfLines={1}>{unitName}</Txt>
                             </View>
-                            <Text category='s1' numberOfLines={2} style={{height: 50, color: '#222B45', marginTop: 8}}>{title}</Text>
-                            <Text category='s2' style={{color: '#222B45',}}>Nov 12, 2019</Text>
+                            <Txt category='s1' numberOfLines={2} style={{height: 50, color: '#222B45', marginTop: 8}}>{deskripsi}</Txt>
+                            <Txt category='s2' style={{color: '#222B45',}}>{dateFormat(date)}</Txt>
                         </TouchableOpacity>
                     </Card>
                 </View>
@@ -144,13 +185,21 @@ export default class Dashboard extends Component {
                     <Card style={s.categoryTiles}>
                         <TouchableOpacity onPress={() => this.props.navigation.navigate(this.state.categoryNavigation[index])}>
                             <Image source={this.state.categoryIcon[index]} style={s.categoryIcon} />
-                            <Text numberOfLines={1} style={s.categoryTilesTitle}>{title}</Text>
+                            <Txt numberOfLines={1} style={s.categoryTilesTitle}>{title}</Txt>
                         </TouchableOpacity>
                     </Card>
                     
                 </View>
             )
         })
+
+        const RefreshingIndicator = () => {
+            if (this.state.refreshing) {
+                return (<ActivityIndicator size="large" />);
+            } else {
+                return null;
+            }
+        }
 
         return (
             <View style={[style.mainContainer, s.whiteBg]}>
@@ -175,7 +224,7 @@ export default class Dashboard extends Component {
 						            <Icon name={'search'} style={s.inputIcon} />
                                 </View>
                             </View>
-                            <Text numberOfLines={2} style={s.headerText}>Buat Request Lebih Mudah Sekarang Juga</Text>
+                            <Txt numberOfLines={2} style={s.headerText}>Buat Request Lebih Mudah Sekarang Juga</Txt>
                         </ImageBackground>
 
                         <View style={[style.roundedTop, s.contentContainer]}>
@@ -190,7 +239,7 @@ export default class Dashboard extends Component {
                             <ImageBackground source={img} style={s.bannerContainer}>
                                 <View style={s.bgOverlay} />
                                 <View style={s.bannerContent}>
-                                    <Text style={s.bannerText}>Cek request untukmu di sini</Text>
+                                    <Txt style={s.bannerText}>Cek request untukmu di sini</Txt>
                                     <TouchableOpacity>
                                         <View style={s.circleArrow}>
                                             <Icon name={'arrow-right'} style={s.iconArrow} />
@@ -203,16 +252,24 @@ export default class Dashboard extends Component {
                         <View style={s.requestContainer}>
                             <View style={s.hdeaderSearchbar}>
                                 <View style={s.requestSignTitle}/>
-                                <Text style={s.requestTitle}>Request Terbaru</Text>
+                                <Txt style={s.requestTitle}>Request Terbaru</Txt>
                             </View>
                             <View style={{marginHorizontal: -4, marginTop: 16, marginBottom: 16}}>
-                                    <FlatList
-                                        data={DATA}
-                                        renderItem={({item}) => <LatestRequest unit_name={item.unit_name} title={item.title} status={item.status} />}
-                                        keyExtractor={item => item.id}
-                                        horizontal={true}
-                                        contentContainerStyle={{paddingHorizontal: 16,}}
-                                    />
+                                <RefreshingIndicator />
+                                <FlatList
+                                    data={this.state.latestRequest}
+                                    renderItem={({item}) => <LatestRequest unitName={item.unitName} deskripsi={item.deskripsi} status={item.status} date={item.tanggal} />}
+                                    keyExtractor={item => item.idOrderPok}
+                                    horizontal={true}
+                                    ListEmptyComponent={() => {
+                                        if (!this.state.refreshing) {
+                                            return (<Txt>Tidak ada request</Txt>)
+                                        } else {
+                                            return null;
+                                        }
+                                    }}
+                                    contentContainerStyle={{paddingHorizontal: 16,}}
+                                />
                             </View>
                         </View>
                     </View>
