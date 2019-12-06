@@ -171,7 +171,6 @@ export default class Dashboard extends Component {
 							            autoCapitalize="none"
 							            onChangeText={(requestQuery) => this.setState({requestQuery})}
 							            value={this.state.requestQuery}
-							            autoFocus={true}
 							            placeholderTextColor="#d3d4cf" />
 						            <Icon name={'search'} style={s.inputIcon} />
                                 </View>

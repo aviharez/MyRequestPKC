@@ -36,11 +36,21 @@ const {width: WIDTH} = Dimensions.get('window');
 class SignInBtn extends Component {
 	render() {
 		const {signInStatus, ...restProps} = this.props;
+		const signInText = () => {
+			if (signInStatus == 'processing') {
+				return (<ActivityIndicator size="large" color='white' style={{marginVertical: 4}} />);
+			} else {
+				return (<TxtBold style={s.signInBtnTxt}>Sign In</TxtBold>);
+			}
+		}
+
 		if (Platform.OS === 'android') {
 			return (
 				<TouchableNativeFeedback {...restProps}>
 					<View style={s.signInBtn}>
-						<TxtBold style={s.signInBtnTxt}>{signInStatus}</TxtBold>
+						{/* <TxtBold style={s.signInBtnTxt}>{signInStatus}</TxtBold> */}
+						{/* <ActivityIndicator size="large" color='white' style={{marginVertical: 4}} /> */}
+						{signInText()}
 					</View>
 				</TouchableNativeFeedback>
 			);
@@ -57,6 +67,8 @@ class SignInBtn extends Component {
 }
 
 export default class LoginPage extends Component {
+	_isMounted = false;
+
 	constructor(props) {
 		super(props);
 
@@ -64,17 +76,16 @@ export default class LoginPage extends Component {
 			isPasswordVisible: false,
 			username: null,
 			password: null,
-			signInStatus: 'Sign In',
-			isMounted: false,
+			signInStatus: 'default',
 		}
 	}
 
 	componentDidMount() {
-		this.setState({isMounted: true});
+		this._isMounted = true;
 	}
 
 	componentWillUnmount() {
-		this.setState({isMounted: false});
+		this._isMounted = false;
 	}
 
 	static navigationOption = {
@@ -83,40 +94,46 @@ export default class LoginPage extends Component {
 
 	proceedLogin = async () => {
 		if ((this.state.username == '' || this.state.username == null) || (this.state.password == '' || this.state.password == null)) {
-			alert('Masih kosong itu woi');
+			alert('Username atau password belum diisi');
 			return;
 		}
 
-		this.setState({signInStatus: 'Processing...'});
-		let response = await fetch(host + 'api/auth', {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify({
-				nikSap: this.state.username,
-				password: this.state.password,
-			})
-		});
-		response = await response.json();
+		try {
+			this.setState({signInStatus: 'processing'});
+			let response = await fetch(host + 'api/auth', {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify({
+					nikSap: this.state.username,
+					password: this.state.password,
+				})
+			});
+			response = await response.json();
 
-		if (response.status == 'success') {
-			await AsyncStorage.multiSet([
-				['logged', 'yes'],
-				['nikSap', response.nikSap],
-				['unitId', response.unitId],
-				['isUnitHead', response.isUnitHead]
-			]);
-			this.props.navigation.navigate('app');
-		} else if (response.status == 'wrongNikSap') {
-			alert('Nik SAP anda salah, silakan periksa kembali');
-			this.setState({username: null});
-		} else if (response.status == 'wrongPassword') {
-			alert('Password anda salah, silakan periksa kembali');
-			this.setState({password: null});
+			if (response.status == 'success') {
+				await AsyncStorage.multiSet([
+					['logged', 'yes'],
+					['nikSap', response.nikSap],
+					['unitId', response.unitId],
+					['isUnitHead', response.isUnitHead]
+				]);
+				this.props.navigation.navigate('app');
+			} else if (response.status == 'wrongNikSap') {
+				alert('Nik SAP anda salah, silakan periksa kembali');
+				this.setState({username: null});
+			} else if (response.status == 'wrongPassword') {
+				alert('Password anda salah, silakan periksa kembali');
+				this.setState({password: null});
+			}
+		} catch (err) {
+			alert('Gagal memproses login, silakan periksa koneksi internet anda');
 		}
 
-		this.setState({signInStatus: 'Sign In'});
+		if (this._isMounted) {
+			this.setState({signInStatus: 'default'});
+		}
 	}
 
 	render() {
@@ -139,7 +156,6 @@ export default class LoginPage extends Component {
 							autoCapitalize="none"
 							onChangeText={(username) => this.setState({username})}
 							value={this.state.username}
-							autoFocus={true}
 							placeholderTextColor="rgba(51, 51, 51, 0.8)'" />
 						<Icon name={Platform.OS === 'android' ? 'md-person' : 'ios-person' } style={s.inputIcon} />
 					</View>
