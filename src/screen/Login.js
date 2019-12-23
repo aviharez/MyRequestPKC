@@ -48,19 +48,9 @@ class SignInBtn extends Component {
 			return (
 				<TouchableNativeFeedback {...restProps}>
 					<View style={s.signInBtn}>
-						{/* <TxtBold style={s.signInBtnTxt}>{signInStatus}</TxtBold> */}
-						{/* <ActivityIndicator size="large" color='white' style={{marginVertical: 4}} /> */}
 						{signInText()}
 					</View>
 				</TouchableNativeFeedback>
-			);
-		} else {
-			return (
-				<TouchableHighlight {...restProps}>
-					<View style={s.signInBtn}>
-						<TxtBold style={s.signInBtnTxt}>{signInStatus}</TxtBold>
-					</View>
-				</TouchableHighlight>
 			);
 		}
 	}

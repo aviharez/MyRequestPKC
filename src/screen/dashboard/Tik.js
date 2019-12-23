@@ -43,16 +43,16 @@ export default class Tik extends Component {
                 require('../../../assets/icons/tik/komunikasi.png'),
                 require('../../../assets/icons/tik/refill.png'),
             ],
-            categoryData: [
-                'PC',
-                'Network',
-                'SAP',
-                'Non SAP',
-                'Vidcon',
-                'Printer',
-                'CCTV',
-                'Komunikasi',
-                'Refill Toner'
+            categoryId: [
+                'TI1',
+                'TI2',
+                'TI3',
+                'TI4',
+                'TI5',
+                'TI6',
+                'TI7',
+                'TI8',
+                'TI9'
             ],
             refreshing: false,
         }
@@ -72,7 +72,7 @@ export default class Tik extends Component {
             return (
                 <View style={[style.col, style.col4]} key={index}>
                     <Card style={s.categoryTiles}>
-                        <TouchableOpacity onPress={() => this.props.navigation.navigate('FormPok', {subCategory: this.state.categoryData[index]})}>
+                        <TouchableOpacity onPress={() => this.props.navigation.navigate('FormPok', {subCategory: this.state.categoryTitle[index], subCategoryId: this.state.categoryId[index]})}>
                             <Image source={this.state.categoryIcon[index]} style={s.categoryIcon} />
                             <Text numberOfLines={1} style={s.categoryTilesTitle}>{title}</Text>
                         </TouchableOpacity>

@@ -12,22 +12,26 @@ import {
     Dimensions,
     Picker,
     Platform,
-    TouchableNativeFeedback
+    TouchableNativeFeedback,
+    Alert
 } from 'react-native';
 
+import {NavigationActions, StackActions} from 'react-navigation';
+import AsyncStorage from '@react-native-community/async-storage';
 import Icon from 'react-native-vector-icons/Feather';
 
 import {style} from '../../../assets/styles/Style';
 import {Txt, TxtBold} from '../../component/Text';
+import {host} from '../../config/ApiHost';
 
 const {width: WIDTH} = Dimensions.get('window');
 
 
 class RequestBtn extends Component {
 	render() {
-		const {signInStatus, ...restProps} = this.props;
+		const {isProcessing, ...restProps} = this.props;
 		const requestText = () => {
-			if (signInStatus == 'processing') {
+			if (isProcessing) {
 				return (<ActivityIndicator size="large" color='white' style={{marginVertical: 4}} />);
 			} else {
 				return (<TxtBold style={s.requestBtnTxt}>Submit</TxtBold>);
@@ -38,19 +42,9 @@ class RequestBtn extends Component {
 			return (
 				<TouchableNativeFeedback {...restProps}>
 					<View style={s.requestBtn}>
-						{/* <TxtBold style={s.signInBtnTxt}>{signInStatus}</TxtBold> */}
-						{/* <ActivityIndicator size="large" color='white' style={{marginVertical: 4}} /> */}
 						{requestText()}
 					</View>
 				</TouchableNativeFeedback>
-			);
-		} else {
-			return (
-				<TouchableHighlight {...restProps}>
-					<View style={s.requestBtn}>
-						<TxtBold style={s.requestBtnTxt}>{signInStatus}</TxtBold>
-					</View>
-				</TouchableHighlight>
 			);
 		}
 	}
@@ -61,13 +55,79 @@ export default class FormPok extends Component {
     constructor(props) {
         super(props);
 
+        this.getUnitId();
+
         this.state = {
-            kdmesin: '',
-            description: '',
-            priority: '',
-            pop: false,
+            idSubKategori: this.props.navigation.getParam('subCategoryId'),
+            kode_mesin: null,
+            deskripsi: null,
+            prioritas: null,
+            penghentianPabrik: false,
             dingin: false,
-            panas: false
+            panas: false,
+            pemohon: null,
+            unitId: null,
+            isProcessing: false,
+        }
+    }
+
+    getUnitId = async () => {
+        const unitId = await AsyncStorage.getItem('unitId')
+        const nikSap = await AsyncStorage.getItem('nikSap')
+        this.setState({unitId: unitId, pemohon: nikSap})
+    }
+
+    submitData = async () => {
+        const {kode_mesin, deskripsi, prioritas, penghentianPabrik, dingin, panas, ...restState} = this.state;
+        if (!kode_mesin || !deskripsi || !prioritas) {
+            alert('Kode mesin, deskripsi, dan prioritas wajib diisi')
+            return
+        }
+
+        try {
+            this.setState({isProcessing: true})
+            var syarat = null
+            if (dingin && panas) {
+                syarat = 'both'
+            } else if (dingin && !panas) {
+                syarat = 'dingin'
+            } else if (panas && !dingin) {
+                syarat = 'panas'
+            }
+            let response = await fetch(host + 'api/submitOrderPok', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    idSubKategori: this.state.idSubKategori,
+                    kode_mesin: this.state.kode_mesin,
+                    deskripsi: this.state.deskripsi,
+                    prioritas: this.state.prioritas,
+                    penghentianPabrik: this.state.penghentianPabrik == true ? 1 : 0,
+                    syarat: syarat,
+                    unitId: this.state.unitId,
+                    pemohon: this.state.pemohon
+                })
+            })
+
+            response = await response.json()
+            if (response.status == 'success') {
+                this.setState({isProcessing: false})
+                let picDeviceToken = response.picDeviceToken
+                const resetAction = StackActions.reset({
+                    index: 0,
+                    actions: [NavigationActions.navigate({routeName: 'Dashboard'})]
+                })
+                Alert.alert('YEAY!', 'Request order berhasil disubmit,\nsilakan tunggu persetujuan dari kepala unit anda', [{
+                    text: 'OK', onPress: () => this.props.navigation.dispatch(resetAction)
+                }], {cancelable: false})
+            } else {
+                this.setState({isProcessing: false})
+            }
+        } catch (err) {
+            alert('Gagal memproses request order, silakan periksa koneksi internet anda')
+            console.log(err)
         }
     }
 
@@ -91,24 +151,24 @@ export default class FormPok extends Component {
 							        style={s.textInput}
 							        placeholder="Kode Mesin"
 							        autoCapitalize="none"
-							        onChangeText={(kdmesin) => this.setState({kdmesin})}
-							        value={this.state.kdmesin}
+							        onChangeText={(kode_mesin) => this.setState({kode_mesin})}
+							        value={this.state.kode_mesin}
 							        placeholderTextColor="#d3d4cf" />
                                 <Txt style={{ marginTop: 16 }}>Deskripsi</Txt>
                                 <TextInput
 							        style={s.textInput}
 							        placeholder="Deskripsi"
 							        autoCapitalize="none"
-							        onChangeText={(description) => this.setState({description})}
-							        value={this.state.description}
+							        onChangeText={(deskripsi) => this.setState({deskripsi})}
+							        value={this.state.deskripsi}
 							        placeholderTextColor="#d3d4cf" />
                                 <Txt style={{ marginTop: 16 }}>Prioritas</Txt>
                                 <Picker
-                                    selectedValue={this.state.priority}
+                                    selectedValue={this.state.prioritas}
                                     itemStyle={s.textInput}
                                     style={s.textInput}
                                     onValueChange={(itemValue, itemIndex) =>
-                                      this.setState({priority: itemValue})
+                                      this.setState({prioritas: itemValue})
                                     }>
                                     <Picker.Item label="Pilih Prioritas" value="" />
                                     <Picker.Item label="E (Urgent, harus segera dikerjakan)" value="E" />
@@ -119,8 +179,8 @@ export default class FormPok extends Component {
                                 <Txt style={{ marginTop: 16, marginBottom: 8 }}>Ketentuan</Txt>
                                 <View style={{ flexDirection: 'row' }}>
                                     <CheckBox
-                                      value={this.state.pop}
-                                      onValueChange={() => this.setState({ pop: !this.state.pop })}
+                                      value={this.state.penghentianPabrik}
+                                      onValueChange={() => this.setState({ penghentianPabrik: !this.state.penghentianPabrik })}
                                     />
                                     <Text style={{marginTop: 5}}> Penghentian Operasi Pabrik</Text>
                                 </View>
@@ -138,7 +198,7 @@ export default class FormPok extends Component {
                                     />
                                     <Text style={{marginTop: 5}}> Ijin Pekerjaan Dingin Disyaratkan</Text>
                                 </View>
-                                <RequestBtn />
+                                <RequestBtn onPress={this.submitData} isProcessing={this.state.isProcessing} />
                             </View>
                         </View>
                     </View>
