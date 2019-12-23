@@ -54,7 +54,7 @@ export default class Bengkel extends Component {
             return (
                 <View style={[style.col, style.col4]} key={index}>
                     <Card style={s.categoryTiles}>
-                        <TouchableOpacity onPress={() => this.props.navigation.navigate(this.state.categoryData[index])}>
+                        <TouchableOpacity onPress={() => this.props.navigation.navigate('FormPok', {subCategory: this.state.categoryData[index]})}>
                             <Image source={this.state.categoryIcon[index]} style={s.categoryIcon} />
                             <Text numberOfLines={1} style={s.categoryTilesTitle}>{title}</Text>
                         </TouchableOpacity>

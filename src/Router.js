@@ -17,6 +17,7 @@ import Lainnya from './screen/dashboard/Menu';
 import MyRequest from './screen/MyRequest';
 import Notification from './screen/Notifcation';
 import Profile from './screen/Profile';
+import FormPok from './screen/dashboard/FormPok';
 import { createStackNavigator } from 'react-navigation-stack';
 
 export default bottomTabNavigator = createBottomTabNavigator(
@@ -30,7 +31,8 @@ export default bottomTabNavigator = createBottomTabNavigator(
       Konsumsi,
       Pinken,
       ATK,
-      Lainnya
+      Lainnya,
+      FormPok
     }, {
       defaultNavigationOptions: {
         header: null
