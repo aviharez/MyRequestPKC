@@ -13,51 +13,18 @@ import {
     Dimensions,
     ActivityIndicator
 } from 'react-native';
-
+import AsyncStorage from '@react-native-community/async-storage';
 import Icon from 'react-native-vector-icons/Feather';
 
 import bg from '../../assets/images/dashboard-bg.jpg';
 import img from '../../assets/images/banner-bg.jpg';
 import {host} from '../config/ApiHost';
+import {style} from '../../assets/styles/Style';
 
 import Card from '../component/Card';
 import {Txt} from '../component/Text';
 
-import {style} from '../../assets/styles/Style';
-import AsyncStorage from '@react-native-community/async-storage';
-
 const {width: WIDTH} = Dimensions.get('window');
-
-const DATA = [
-    {
-      id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-      name: 'Syifa Nurzain',
-      unit_name: 'Sekretaris Perusahaan',
-      title: 'Perbaikan Iman Dan Takwa',
-      status: 'E',
-    },
-    {
-      id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f66',
-      name: 'Kevin Christianto',
-      unit_name: 'Departemen Teknologi Informasi',
-      title: 'Perbaikan gizi',
-      status: '2',
-    },
-    {
-      id: '58694a0f-3da1-471f-bd96-145571e29d72',
-      name: 'Syifa Nurzain',
-      unit_name: 'Departemen Humas',
-      title: 'Perbaikan jaringan sosial masyarakat dalam kehidupan bermasyarakat di lingkungan sekitar',
-      status: '3'
-    },
-    {
-      id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-      name: 'Syifa Nurzain',
-      unit_name: 'Departemen Pengadaan',
-      title: 'Perbaikan naon deui sok',
-      status: '1',
-    },
-];
 
 export default class Dashboard extends Component {
     _isMounted = false;
@@ -169,10 +136,10 @@ export default class Dashboard extends Component {
                         <TouchableOpacity>
                             <View style={{backgroundColor: 'transparent', flexDirection: 'row',}}>
                                 <Txt style={[statusBadgeBg(), s.requestStatusBadge,]}>{status}</Txt>
-                                <Txt category='s2' style={{color: '#222B45', marginTop: 2, width: 130}} numberOfLines={1}>{unitName}</Txt>
+                                <Txt numberOfLines={1} style={{color: '#222B45', marginTop: 2, width: 130}}>{unitName}</Txt>
                             </View>
-                            <Txt category='s1' numberOfLines={2} style={{height: 50, color: '#222B45', marginTop: 8}}>{deskripsi}</Txt>
-                            <Txt category='s2' style={{color: '#222B45',}}>{dateFormat(date)}</Txt>
+                            <Txt numberOfLines={2} style={{height: 50, color: '#222B45', marginTop: 8}}>{deskripsi}</Txt>
+                            <Txt style={{color: '#222B45',}}>{dateFormat(date)}</Txt>
                         </TouchableOpacity>
                     </Card>
                 </View>
@@ -224,7 +191,7 @@ export default class Dashboard extends Component {
 						            <Icon name={'search'} style={s.inputIcon} />
                                 </View>
                             </View>
-                            <Txt numberOfLines={2} style={s.headerText}>Buat Request Lebih Mudah Sekarang Juga</Txt>
+                            <Txt numberOfLines={2} style={s.headerText}>Buat Request Menjadi{"\n"}Lebih Mudah</Txt>
                         </ImageBackground>
 
                         <View style={[style.roundedTop, s.contentContainer]}>
@@ -285,8 +252,6 @@ const s = StyleSheet.create({
         padding: 16,
         flex: 1,
         flexDirection: 'column',
-        // borderWidth: 1,
-        // borderColor: 'red',
     },
     hdeaderSearchbar: {
         flex: 1,
