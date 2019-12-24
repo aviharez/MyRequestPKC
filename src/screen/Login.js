@@ -106,7 +106,9 @@ export default class LoginPage extends Component {
 				await AsyncStorage.multiSet([
 					['logged', 'yes'],
 					['nikSap', response.nikSap],
+					['namaPegawai', response.namaPegawai],
 					['unitId', response.unitId],
+					['posTitle', response.posTitle],
 					['isUnitHead', response.isUnitHead]
 				]);
 				this.props.navigation.navigate('app');

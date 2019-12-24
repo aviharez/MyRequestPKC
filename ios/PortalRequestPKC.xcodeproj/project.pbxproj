@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* PortalRequestPKCTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* PortalRequestPKCTests.m */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
@@ -36,6 +35,8 @@
 		EFC01876A5F7FD407FB1C657 /* libPods-PortalRequestPKC-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D7537B9850FA01E77EBD3AE /* libPods-PortalRequestPKC-tvOS.a */; };
 		F1FDEFC8315748949E00A505 /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2A948FDB3A7B4B6EA5E98E1A /* AntDesign.ttf */; };
 		F58B941FB0B2486A8E30BA61 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 103B15C77A154CBCB2876DDE /* SimpleLineIcons.ttf */; };
+		B9878F6921904CED9F05E0A7 /* Product Sans.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 26547EB3459A44FB8EB1D835 /* Product Sans.ttf */; };
+		AD699B022F18491FA26F6D3F /* Product Sans Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 30C7ECC24CD7476C83041B28 /* Product Sans Bold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -99,6 +100,8 @@
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 		F2EB94B7C140E4E78A60F889 /* libPods-PortalRequestPKCTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PortalRequestPKCTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		26547EB3459A44FB8EB1D835 /* Product Sans.ttf */ = {isa = PBXFileReference; name = "Product Sans.ttf"; path = "../assets/fonts/Product Sans.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		30C7ECC24CD7476C83041B28 /* Product Sans Bold.ttf */ = {isa = PBXFileReference; name = "Product Sans Bold.ttf"; path = "../assets/fonts/Product Sans Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -250,6 +253,8 @@
 				E2C366480CDF4C9485CBCAFF /* Octicons.ttf */,
 				103B15C77A154CBCB2876DDE /* SimpleLineIcons.ttf */,
 				CEF0D71F3ACA4E4684302E9B /* Zocial.ttf */,
+				26547EB3459A44FB8EB1D835 /* Product Sans.ttf */,
+				30C7ECC24CD7476C83041B28 /* Product Sans Bold.ttf */,
 			);
 			name = Resources;
 			path = "";
@@ -412,6 +417,8 @@
 				434050C568774054BB45F0E6 /* Octicons.ttf in Resources */,
 				F58B941FB0B2486A8E30BA61 /* SimpleLineIcons.ttf in Resources */,
 				51CCBCBBD95C46EF85623F25 /* Zocial.ttf in Resources */,
+				B9878F6921904CED9F05E0A7 /* Product Sans.ttf in Resources */,
+				AD699B022F18491FA26F6D3F /* Product Sans Bold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

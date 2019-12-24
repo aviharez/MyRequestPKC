@@ -119,9 +119,18 @@ export default class FormPok extends Component {
                     index: 0,
                     actions: [NavigationActions.navigate({routeName: 'Dashboard'})]
                 })
-                Alert.alert('YEAY!', 'Request order berhasil disubmit,\nsilakan tunggu persetujuan dari kepala unit anda', [{
-                    text: 'OK', onPress: () => this.props.navigation.dispatch(resetAction)
-                }], {cancelable: false})
+                Alert.alert(
+                    'YEAY!', 
+                    'Request order berhasil disubmit,\nsilakan tunggu persetujuan dari kepala unit anda',
+                    [{
+                        text: 'OK',
+                        onPress: () => {
+                            this.props.navigation.dispatch(resetAction)
+                            this.props.navigation.navigate('MyRequest')
+                        }
+                    }],
+                    {cancelable: false}
+                )
             } else {
                 this.setState({isProcessing: false})
             }
@@ -182,21 +191,21 @@ export default class FormPok extends Component {
                                       value={this.state.penghentianPabrik}
                                       onValueChange={() => this.setState({ penghentianPabrik: !this.state.penghentianPabrik })}
                                     />
-                                    <Text style={{marginTop: 5}}> Penghentian Operasi Pabrik</Text>
+                                    <Txt style={{marginTop: 5}}> Penghentian Operasi Pabrik</Txt>
                                 </View>
                                 <View style={{ flexDirection: 'row' }}>
                                     <CheckBox
                                       value={this.state.panas}
                                       onValueChange={() => this.setState({ panas: !this.state.panas })}
                                     />
-                                    <Text style={{marginTop: 5}}> Ijin Pekerjaan Panas Disyaratkan</Text>
+                                    <Txt style={{marginTop: 5}}> Ijin Pekerjaan Panas Disyaratkan</Txt>
                                 </View>
                                 <View style={{ flexDirection: 'row' }}>
                                     <CheckBox
                                       value={this.state.dingin}
                                       onValueChange={() => this.setState({ dingin: !this.state.dingin })}
                                     />
-                                    <Text style={{marginTop: 5}}> Ijin Pekerjaan Dingin Disyaratkan</Text>
+                                    <Txt style={{marginTop: 5}}> Ijin Pekerjaan Dingin Disyaratkan</Txt>
                                 </View>
                                 <RequestBtn onPress={this.submitData} isProcessing={this.state.isProcessing} />
                             </View>

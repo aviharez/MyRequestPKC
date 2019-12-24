@@ -13,18 +13,19 @@ import {
     Dimensions,
     ActivityIndicator
 } from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
-import Icon from 'react-native-vector-icons/Feather';
+import {Icon} from 'react-native-elements'
+import AsyncStorage from '@react-native-community/async-storage'
+import FeatherIcon from 'react-native-vector-icons/Feather'
 
-import bg from '../../assets/images/dashboard-bg.jpg';
-import img from '../../assets/images/banner-bg.jpg';
-import {host} from '../config/ApiHost';
-import {style} from '../../assets/styles/Style';
+import bg from '../../assets/images/dashboard-bg.jpg'
+import img from '../../assets/images/banner-bg.jpg'
+import {host} from '../config/ApiHost'
+import {style} from '../../assets/styles/Style'
 
-import Card from '../component/Card';
-import {Txt} from '../component/Text';
+import Card from '../component/Card'
+import {Txt} from '../component/Text'
 
-const {width: WIDTH} = Dimensions.get('window');
+const {width: WIDTH} = Dimensions.get('window')
 
 export default class Dashboard extends Component {
     _isMounted = false;
@@ -102,14 +103,14 @@ export default class Dashboard extends Component {
     
     render() {
 
-        const LatestRequest = ({unitName, deskripsi, status, date}) => {
+        const LatestRequest = ({unitName, deskripsi, prioritas, date}) => {
 
-            const statusBadgeBg = () => {
-                if (status == 'E') {
+            const prioritasBadgeBg = () => {
+                if (prioritas == 'E') {
                     return style.bgAccent4;
-                } else if (status == 1) {
+                } else if (prioritas == '1') {
                     return style.bgAccent2;
-                } else if (status == 2) {
+                } else if (prioritas == '2') {
                     return style.bgAccent1;
                 } else {
                     return style.bgAccent3;
@@ -135,7 +136,7 @@ export default class Dashboard extends Component {
                     <Card style={[style.bgPrimary, s.requestTiles]}>
                         <TouchableOpacity>
                             <View style={{backgroundColor: 'transparent', flexDirection: 'row',}}>
-                                <Txt style={[statusBadgeBg(), s.requestStatusBadge,]}>{status}</Txt>
+                                <Txt style={[prioritasBadgeBg(), s.requestPrioritasBadge,]}>{prioritas}</Txt>
                                 <Txt numberOfLines={1} style={{color: '#222B45', marginTop: 2, width: 130}}>{unitName}</Txt>
                             </View>
                             <Txt numberOfLines={2} style={{height: 50, color: '#222B45', marginTop: 8}}>{deskripsi}</Txt>
@@ -178,7 +179,16 @@ export default class Dashboard extends Component {
                             
                             <View style={s.hdeaderSearchbar}>
                                 <TouchableOpacity>
-                                    <Image source={require('../../assets/icons/user.png')} style={s.headerUser} />
+                                    {/* <Image source={require('../../assets/icons/user.png')} style={s.headerUser} /> */}
+                                    <Icon
+                                        name='user'
+                                        type='feather'
+                                        reverse
+                                        color='#fff'
+                                        reverseColor='#5794ff'
+                                        size={18}
+                                        containerStyle={s.profileIcon}
+                                    />
                                 </TouchableOpacity>
                                 <View>
                                     <TextInput
@@ -188,7 +198,7 @@ export default class Dashboard extends Component {
 							            onChangeText={(requestQuery) => this.setState({requestQuery})}
 							            value={this.state.requestQuery}
 							            placeholderTextColor="#d3d4cf" />
-						            <Icon name={'search'} style={s.inputIcon} />
+						            <FeatherIcon name={'search'} style={s.inputIcon} />
                                 </View>
                             </View>
                             <Txt numberOfLines={2} style={s.headerText}>Buat Request Menjadi{"\n"}Lebih Mudah</Txt>
@@ -209,7 +219,7 @@ export default class Dashboard extends Component {
                                     <Txt style={s.bannerText}>Cek request untukmu di sini</Txt>
                                     <TouchableOpacity>
                                         <View style={s.circleArrow}>
-                                            <Icon name={'arrow-right'} style={s.iconArrow} />
+                                            <FeatherIcon name={'arrow-right'} style={s.iconArrow} />
                                         </View>
                                     </TouchableOpacity>
                                 </View>
@@ -225,7 +235,7 @@ export default class Dashboard extends Component {
                                 <RefreshingIndicator />
                                 <FlatList
                                     data={this.state.latestRequest}
-                                    renderItem={({item}) => <LatestRequest unitName={item.unitName} deskripsi={item.deskripsi} status={item.status} date={item.tanggal} />}
+                                    renderItem={({item}) => <LatestRequest unitName={item.unitName} deskripsi={item.deskripsi} prioritas={item.prioritas} date={item.tanggal} />}
                                     keyExtractor={item => item.idOrderPok}
                                     horizontal={true}
                                     ListEmptyComponent={() => {
@@ -313,7 +323,7 @@ const s = StyleSheet.create({
         marginHorizontal: 4,
         backgroundColor: 'rgba(136, 173, 236, .1)',
     },
-    requestStatusBadge: {
+    requestPrioritasBadge: {
         color: '#fff',
         width: 24,
         height: 24,
@@ -414,5 +424,8 @@ const s = StyleSheet.create({
         fontWeight: 'bold',
         left: 24,
         top: -2
+    },
+    profileIcon: {
+        marginTop: -2
     }
 })
