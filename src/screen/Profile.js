@@ -54,7 +54,7 @@ export default class Profile extends Component {
             {
                 title: 'Persetujuan Request Order',
                 icon: 'check-square',
-                onPress: null,
+                onPress: this.props.navigation.navigate('Approval'),
             }, {
                 title: 'Ubah Password',
                 icon: 'key',

@@ -18,6 +18,8 @@ import MyRequest from './screen/MyRequest';
 import Notification from './screen/Notifcation';
 import Profile from './screen/Profile';
 import FormPok from './screen/dashboard/FormPok';
+import DetailRequest from './screen/request/DetailRequest';
+import Approval from './screen/approval/Approval';
 import { createStackNavigator } from 'react-navigation-stack';
 
 export default bottomTabNavigator = createBottomTabNavigator(
@@ -38,9 +40,23 @@ export default bottomTabNavigator = createBottomTabNavigator(
         header: null
       }
     }),
-    MyRequest: MyRequest,
+    MyRequest: createStackNavigator({
+      MyRequest, 
+      DetailRequest
+    }, {
+      defaultNavigationOptions: {
+        header: null
+      }
+    }),
     Notification: Notification,
-    Profile: Profile
+    Profile: createStackNavigator({
+      Profile,
+      Approval
+    }, {
+      defaultNavigationOptions: {
+        header: null
+      }
+    })
   },
   {
     defaultNavigationOptions: ({ navigation }) => ({
