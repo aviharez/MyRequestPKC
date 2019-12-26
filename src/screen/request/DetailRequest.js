@@ -5,7 +5,8 @@ import {
     Text,
     ScrollView,
     TouchableOpacity,
-    Image
+    Image,
+    TextInput
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Feather';
@@ -16,6 +17,14 @@ import {style} from '../../../assets/styles/Style';
 import {Txt, TxtBold} from '../../component/Text';
 
 export default class DetailRequest extends Component {
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            keterangan: null,
+        }
+    }
 
     render() {
 
@@ -76,7 +85,7 @@ export default class DetailRequest extends Component {
                                         <Txt style={{ fontSize: 16, marginLeft: 8 }}>2019-12-12</Txt>
                                     </View>
                                     <View style={{ flexDirection: 'row', marginTop: 4 }}>
-                                        <Icon name={'alert-circle'} style={{ fontSize: 16, alignSelf: 'center', color: '#5794ff' }} />
+                                        <Icon name={'alert-circle'} style={{ fontSize: 16, alignSelf: 'center', color: 'red' }} />
                                         <Txt style={{ fontSize: 16, marginLeft: 8 }}>E (Urgent, harus segera dikerjakan)</Txt>
                                     </View>
                                     <TxtBold style={{ fontSize: 16, marginTop: 24 }}>Status Request</TxtBold>
@@ -115,7 +124,12 @@ export default class DetailRequest extends Component {
                                         height: 100,
                                         marginVertical: 8
                                     }}>
-                                        <Txt style={{ margin: 8 }}>Isi Keterangan</Txt>
+                                        <TextInput 
+                                            multiline={true}
+                                            numberOfLines={5}
+                                            onChangeText={(keterangan) => this.setState({keterangan})}
+                                            value={this.state.keterangan}
+                                            style={{ margin: 8 }} />
                                     </View>
                                 </View>
                             </View>
