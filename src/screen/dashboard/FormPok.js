@@ -57,6 +57,7 @@ export default class FormPok extends Component {
         super(props);
 
         this.getUnitId();
+        console.log()
 
         this.state = {
             idSubKategori: this.props.navigation.getParam('subCategoryId'),
@@ -133,6 +134,7 @@ export default class FormPok extends Component {
                     {cancelable: false}
                 )
             } else {
+                console.log(response)
                 this.setState({isProcessing: false})
             }
         } catch (err) {

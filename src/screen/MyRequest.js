@@ -47,12 +47,12 @@ export default class MyRequest extends React.Component {
         let nikSap = await AsyncStorage.getItem('nikSap')
         try {
             this.setState({isLoading: true})
-            let response = await fetch(host + 'api/getOrderInPok/' + nikSap)
-            response = await response.json()
-            this.setState({incomingRequest: response})
-            response = await fetch(host + 'api/getOrderOutPok/' + nikSap)
+            let response = await fetch(host + 'api/getOrderOutPok/' + nikSap)
             response = await response.json()
             this.setState({outcomingRequest: response})
+            response = await fetch(host + 'api/getOrderInPok/' + nikSap)
+            response = await response.json()
+            this.setState({incomingRequest: response})
         } catch (err) {
             alert('Gagal mengambil data dari server')
             console.log(err)
@@ -106,7 +106,7 @@ export default class MyRequest extends React.Component {
                 this.getRequest()
             }),
             this.props.navigation.addListener('willBlur', () => {
-                this.setState({incomingRequest: null});
+                this.setState({incomingRequest: null, outcomingRequest: null});
             })
         ];
     }
@@ -161,7 +161,7 @@ export default class MyRequest extends React.Component {
             }
 
             return (
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('DetailRequest', {orderId: {id}})}>
+                <TouchableOpacity onPress={() => this.props.navigation.navigate('DetailRequest', {orderId: parseInt(id)})}>
                     <View style={{ flexDirection: 'column', backgroundColor: '#fff', padding: 8 }}>
                         <View style={{ flexDirection: 'row' }}>
                             <Image source={require('../../assets/icons/user.png')} style={{width: 40, height: 40, tintColor: '#5794ff'}} />
@@ -176,7 +176,7 @@ export default class MyRequest extends React.Component {
                                 height: 20,
                                 width: 20,
                                 marginLeft: 8,
-                                marginTop: 4
+                                marginTop: -2
                             }]}>
                                 <Txt style={{ color: '#fff' }}>{prioritas}</Txt>
                             </View>
@@ -186,7 +186,7 @@ export default class MyRequest extends React.Component {
                                 justifyContent: 'center',
                                 height: 18,
                                 marginLeft: 4,
-                                marginTop: 5
+                                marginTop: -1
                             }]}>
                                 <Txt style={{ color: '#fff' }}>{statusName()}</Txt>
                             </View>

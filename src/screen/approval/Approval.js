@@ -14,6 +14,8 @@ import {style} from '../../../assets/styles/Style';
 import {Txt} from '../../component/Text';
 import Icon from 'react-native-vector-icons/Feather';
 import { FlatList } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-community/async-storage';
+import {host} from '../../config/ApiHost'
 
 const { width } = Dimensions.get("window")
 
@@ -37,8 +39,30 @@ const DATA = [
 ]
 
 export default class Approval extends Component {
-    render() {
+    constructor(props) {
+        super(props)
 
+        this.state = {
+            data: null
+        }
+
+        this.getUnapproved()
+    }
+
+    getUnapproved = async () => {
+        let unitId = await AsyncStorage.getItem('unitId')
+        try {
+            let response = await fetch(host + 'api/getUnapprovedOrderPok/' + unitId)
+            response = await response.json()
+            this.setState({data: response})
+            console.log(response)
+        } catch (err) {
+            alert('Gagal mendapatkan data dari server')
+            console.log(err)
+        }
+    }
+
+    render() {
 
         const RequestList = ({id, name, deskripsi, prioritas, date, unitName, status}) => {
 
@@ -54,7 +78,11 @@ export default class Approval extends Component {
                 }
             }
 
-            const dateFormat = (date) => {
+            const dateFormat = (date = null) => {
+                if (date == null) {
+                    return '-'
+                }
+
                 const months = ["Jan", "Feb", "Mar","Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"]
                 let requestDate = date.substr(0, 10)
                 requestDate = requestDate.split('-')
@@ -69,7 +97,7 @@ export default class Approval extends Component {
             }
 
             return (
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('DetailRequest', {orderId: {id}})}>
+                <TouchableOpacity onPress={() => this.props.navigation.navigate('DetailRequest', {orderId: parseInt(id)})}>
                     <View style={{ flexDirection: 'column', backgroundColor: '#fff', padding: 8 }}>
                         <View style={{ flexDirection: 'row' }}>
                             <Image source={require('../../../assets/icons/user.png')} style={{width: 40, height: 40, tintColor: '#5794ff'}} />
@@ -105,7 +133,7 @@ export default class Approval extends Component {
 
         return (
             <View style={[style.mainContainer]}>
-                <ScrollView>
+                {/* <ScrollView> */}
                     <View>
                         <View style={{ flexDirection: 'row', marginVertical: 8, padding: 16 }}>
                             <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
@@ -120,15 +148,15 @@ export default class Approval extends Component {
                         </View>
 
                         <FlatList
-                                data={DATA}
+                                data={this.state.data}
                                 renderItem={
-                                    ({item}) => <RequestList name={item.name} deskripsi={item.deskripsi} prioritas={item.prioritas} date={item.date} unitName={item.unitName} id={item.id} />
+                                    ({item}) => <RequestList name={item.namaPegawai} deskripsi={item.deskripsi} prioritas={item.prioritas} date={item.tanggal} unitName={item.namaSubKategori} id={item.idOrderPok} />
                                 }
                                 keyExtractor={item => item.id}
                                 contentContainerStyle={{paddingHorizontal: 8, width: width}} />
 
                     </View>
-                </ScrollView>
+                {/* </ScrollView> */}
                 
             </View>
         )

@@ -91,7 +91,7 @@ export default class Profile extends Component {
                                 return (
                                     <TouchableOpacity>
                                         <ListItem
-                                            key={index}
+                                            key={Math.floor(Math.random() * 1000000000)}
                                             title={item.title}
                                             titleStyle={{fontFamily: 'Product Sans Bold', color: 'rgba(0, 0, 0, .6)'}}
                                             leftIcon={<Icon name={item.icon} type='feather' color='#5794ff' />}
