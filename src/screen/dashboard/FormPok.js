@@ -7,7 +7,6 @@ import {
     ScrollView,
     TextInput,
     ActivityIndicator,
-    CheckBox,
     Button,
     Dimensions,
     Picker,
@@ -15,6 +14,8 @@ import {
     TouchableNativeFeedback,
     Alert
 } from 'react-native';
+
+import CheckBox from '@react-native-community/checkbox';
 
 import {NavigationActions, StackActions} from 'react-navigation';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -163,11 +164,14 @@ export default class FormPok extends Component {
 							        onChangeText={(kode_mesin) => this.setState({kode_mesin})}
 							        value={this.state.kode_mesin}
 							        placeholderTextColor="#d3d4cf" />
-                                <Txt style={{ marginTop: 16 }}>Deskripsi</Txt>
+                                <Txt style={{ marginTop: 16 }}>Uraian dan deskripsi pekerjaan</Txt>
                                 <TextInput
-							        style={s.textInput}
-							        placeholder="Deskripsi"
+							        style={s.textArea}
+							        placeholder="Uraian dan deskripsi pekerjaan"
 							        autoCapitalize="none"
+                                    multiline={true}
+                                    numberOfLines={5}
+                                    textAlignVertical={'top'}
 							        onChangeText={(deskripsi) => this.setState({deskripsi})}
 							        value={this.state.deskripsi}
 							        placeholderTextColor="#d3d4cf" />
@@ -251,6 +255,19 @@ const s = StyleSheet.create({
 		fontSize: 16,
         width: WIDTH - 32,
         height: 40,
+		backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        borderRadius: 8,
+        borderColor: '#5794ff',
+        borderWidth: 1,
+		paddingStart: 16,
+		paddingEnd: 16,
+        color: 'rgba(51, 51, 51, 0.8)',
+        top: 4
+    },
+    textArea: {
+		fontSize: 16,
+        width: WIDTH - 32,
+        height: 100,
 		backgroundColor: 'rgba(255, 255, 255, 0.8)',
         borderRadius: 8,
         borderColor: '#5794ff',
