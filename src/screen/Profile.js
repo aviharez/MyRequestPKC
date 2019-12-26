@@ -54,15 +54,15 @@ export default class Profile extends Component {
             {
                 title: 'Persetujuan Request Order',
                 icon: 'check-square',
-                onPress: this.props.navigation.navigate('Approval'),
+                onPress: () => this.props.navigation.navigate('Approval'),
             }, {
                 title: 'Ubah Password',
                 icon: 'key',
-                onPress: null,
+                onPress: () => null,
             }, {
                 title: 'Sign Out',
                 icon: 'log-out',
-                onPress: this.signOut,
+                onPress: () => this.signOut(),
             }
         ]
 

@@ -92,7 +92,7 @@ export default class Dashboard extends Component {
         try {
             this.setState({refreshing: true});
             const nikSap = await AsyncStorage.getItem('nikSap');
-            let response = await fetch(host + 'api/getMyOrderPok/' + nikSap + '/5');
+            let response = await fetch(host + 'api/getOrderInPok/' + nikSap + '/5');
             response = await response.json();
             this.setState({latestRequest: response, refreshing: false});
         } catch (err) {
