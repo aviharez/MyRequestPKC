@@ -17,54 +17,7 @@ import {Txt, TxtBold} from '../../component/Text';
 
 export default class DetailRequest extends Component {
 
-    _isMounted = false;
-
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            categoryTitle: [
-                'Permesinan',
-                'Perpipaan & Pengelasan',
-                'Pertukangan'
-            ],
-            categoryIcon: [
-                require('../../../assets/icons/bengkel/permesinan.png'),
-                require('../../../assets/icons/bengkel/perpipaan.png'),
-                require('../../../assets/icons/bengkel/pertukangan.png'),
-            ],
-            categoryData: [
-                'Permesinan',
-                'Perpipaan & Pengelasan',
-                'Pertukangan'
-            ],
-            refreshing: false,
-        }
-    }
-
-    componentDidMount() {
-        this._isMounted = true;
-    }
-
-    componentWillUnmount() {
-        this._isMounted = false;
-    }
-
     render() {
-
-        const CategoryTiles = this.state.categoryTitle.map((title, index) => {
-            return (
-                <View style={[style.col, style.col4]} key={index}>
-                    <Card style={s.categoryTiles}>
-                        <TouchableOpacity onPress={() => this.props.navigation.navigate('FormPok', {subCategory: this.state.categoryData[index]})}>
-                            <Image source={this.state.categoryIcon[index]} style={s.categoryIcon} />
-                            <Text numberOfLines={1} style={s.categoryTilesTitle}>{title}</Text>
-                        </TouchableOpacity>
-                    </Card>
-                    
-                </View>
-            )
-        })
 
         return (
             <View style={[style.mainContainer]}>
@@ -74,21 +27,97 @@ export default class DetailRequest extends Component {
                             <TouchableOpacity style={{flex: 2}} onPress={() => this.props.navigation.goBack()}>
                                 <Icon name={'chevron-left'} style={s.headerBackIcon} />
                             </TouchableOpacity>
+                            <View style={{ flex: 1, marginTop: -16, left: 8 }}>
+                                <TxtBold style={s.headerText}>Kode atau Nomor Mesin</TxtBold>
+                                <Txt style={{fontSize: 18, color: '#fff'}}>Nama Subkategori</Txt>
+                            </View>
+                            
                         </View>
 
                         <View style={s.contentContainer}>
-                            <View style={{marginTop: 32, flexDirection: 'column'}}>
-                                <View style={{ flexDirection: 'row' }}>
-                                    <Icon name={'target'} style={{ height: 16, width: 16 }} />
-                                    <Txt style={{ fontSize: 16, marginLeft: 8 }}>Tanggal</Txt>
+                            <View style={{flexDirection: 'column'}}>
+                                <TouchableOpacity>
+                                    <View style={{ 
+                                        backgroundColor: '#ffaa0d', 
+                                        width: 120, 
+                                        height: 45, 
+                                        borderRadius: 24,
+                                        alignSelf: 'flex-end',
+                                        marginTop: -38,
+                                        marginRight: 12
+                                    }}>
+                                        <Txt style={{ 
+                                            color: '#fff', 
+                                            fontSize: 18, 
+                                            alignContent: 'center', 
+                                            alignSelf: 'center',
+                                            marginTop: 12
+                                        }}>Accept</Txt>
+                                    </View>
+                                </TouchableOpacity>
+                                <View style={{ padding: 16 }}>
+                                    <Txt style={{ fontSize: 16, marginTop: 16 }}>Ini adalah deskripsi untuk mendeskripsikan masalah yang terjadi pada yang dideskripsikan</Txt>
+                                    <View style={{ marginTop: 24, marginBottom: 16, backgroundColor: '#cccbc7', width: '100%', height: 1 }}></View>
+                                    <View style={{ flexDirection: 'row', marginLeft: -4, marginBottom: 16 }}>
+                                        <Image source={require('../../../assets/icons/user.png')} style={{width: 40, height: 40, tintColor: '#5794ff'}} />
+                                        <View style={{ flexDirection: 'column', marginLeft: 8, alignContent: 'center', alignSelf: 'center' }}>
+                                            <Txt style={{ color: '#000', fontSize: 16 }}>Nama yang minta</Txt>
+                                            <Txt style={{ color: '#cccbc7', fontSize: 13 }}>Nama departemen yang minta</Txt>
+                                        </View>
+                                    </View>
+                                    <TxtBold style={{ fontSize: 16 }}>Ketentuan</TxtBold>
+                                    <Txt style={{ fontSize: 14 }}>- Pemberhentian operasi pabrik</Txt>
+                                    <Txt style={{ fontSize: 14 }}>- Ijin pekerjaan panas disyaratkan</Txt>
+                                    <Txt style={{ fontSize: 14 }}>- Ijin pekerjaan panas disyaratkan</Txt>
+                                    
+                                    <View style={{ marginTop: 24, marginBottom: 16, backgroundColor: '#cccbc7', width: '100%', height: 1 }}></View>
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <Icon name={'calendar'} style={{ fontSize: 16, alignSelf: 'center', color: '#5794ff' }} />
+                                        <Txt style={{ fontSize: 16, marginLeft: 8 }}>2019-12-12</Txt>
+                                    </View>
+                                    <View style={{ flexDirection: 'row', marginTop: 4 }}>
+                                        <Icon name={'alert-circle'} style={{ fontSize: 16, alignSelf: 'center', color: '#5794ff' }} />
+                                        <Txt style={{ fontSize: 16, marginLeft: 8 }}>E (Urgent, harus segera dikerjakan)</Txt>
+                                    </View>
+                                    <TxtBold style={{ fontSize: 16, marginTop: 24 }}>Status Request</TxtBold>
+                                    <View style={{ flexDirection: 'row', marginTop: 8 }}>
+                                        <View style={{ flex: 1, flexDirection: 'column' }}>
+                                            <Txt style={{ color: '#cccbc7', fontSize: 12 }}>Diapprove Oleh</Txt>
+                                            <Txt style={{ fontSize: 14 }}>nama orang yang approve</Txt>
+                                        </View>
+                                        <View style={{ flex: 1, flexDirection: 'column' }}>
+                                            <Txt style={{ color: '#cccbc7', fontSize: 12 }}>Tanggal Approve</Txt>
+                                            <Txt style={{ fontSize: 14 }}>2019-12-12</Txt>
+                                        </View>
+                                    </View>
+                                    <View style={{ flexDirection: 'row', marginTop: 8 }}>
+                                        <View style={{ flex: 1, flexDirection: 'column' }}>
+                                            <Txt style={{ color: '#cccbc7', fontSize: 12 }}>Diterima Oleh</Txt>
+                                            <Txt style={{ fontSize: 14 }}>nama orang yang nerima</Txt>
+                                        </View>
+                                        <View style={{ flex: 1, flexDirection: 'column' }}>
+                                            <Txt style={{ color: '#cccbc7', fontSize: 12 }}>Tanggal Diterima</Txt>
+                                            <Txt style={{ fontSize: 14 }}>2019-12-12</Txt>
+                                        </View>
+                                    </View>
+                                    <View style={{ flexDirection: 'row', marginTop: 8 }}>
+                                        <View style={{ flex: 1, flexDirection: 'column' }}>
+                                            <Txt style={{ color: '#cccbc7', fontSize: 12 }}>Diselesaikan Pada</Txt>
+                                            <Txt style={{ fontSize: 14 }}>2019-12-12</Txt>
+                                        </View>
+                                    </View>
+                                    <TxtBold style={{ fontSize: 16, marginTop: 24 }}>Keterangan</TxtBold>
+                                    <View style={{
+                                        borderRadius: 4,
+                                        borderWidth: 1,
+                                        borderColor: '#cccbc7',
+                                        width: '100%',
+                                        height: 100,
+                                        marginVertical: 8
+                                    }}>
+                                        <Txt style={{ margin: 8 }}>Isi Keterangan</Txt>
+                                    </View>
                                 </View>
-                                <View style={{ flexDirection: 'row', marginTop: 8 }}>
-                                    <Icon name={'target'} style={{ height: 16, width: 16 }} />
-                                    <Txt style={{ fontSize: 16, marginLeft: 8 }}>Prioritas</Txt>
-                                </View>
-                                <View style={{ marginTop: 24, backgroundColor: '#cccbc7', width: '100%', height: 1 }}></View>
-                                <TxtBold style={{ fontSize: 16, marginTop: 24,  }}>Kode atau Nomor Mesin</TxtBold>
-                                <Txt style={{ fontSize: 16, marginTop: 8 }}>Ini adalah deskripsi untuk mendeskripsikan masalah yang terjadi pada yang dideskripsikan</Txt>
                             </View>
                         </View>
                     </View>
@@ -100,7 +129,7 @@ export default class DetailRequest extends Component {
 
 const s = StyleSheet.create({
     headerContainer: {
-        height: 280,
+        height: 300,
         padding: 16,
         flex: 1,
         flexDirection: 'column',
@@ -114,18 +143,15 @@ const s = StyleSheet.create({
     },
     headerText: {
         fontSize: 24,
-        width: 250,
-        flex: 1,
+        width: 300,
         color: '#fff',
-        marginTop: -16,
-        left: 8,
-        fontWeight: 'bold',
     },
     contentContainer: {
         padding: 16,
-        marginTop: -20,
+        marginTop: -24,
         backgroundColor: '#fff',
-        borderTopStartRadius: 28
+        borderTopStartRadius: 28,
+        borderTopEndRadius: 28
     },
     categoryTiles: {
         paddingVertical: 16,
