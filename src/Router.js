@@ -51,7 +51,8 @@ export default bottomTabNavigator = createBottomTabNavigator(
     Notification: Notification,
     Profile: createStackNavigator({
       Profile,
-      Approval
+      Approval,
+      DetailRequest
     }, {
       defaultNavigationOptions: {
         header: null

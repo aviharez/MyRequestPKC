@@ -161,7 +161,7 @@ export default class MyRequest extends React.Component {
             }
 
             return (
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('DetailRequest', {orderId: {id}})}>
+                <TouchableOpacity onPress={() => this.props.navigation.navigate('DetailRequest', {orderId: parseInt(id)})}>
                     <View style={{ flexDirection: 'column', backgroundColor: '#fff', padding: 8 }}>
                         <View style={{ flexDirection: 'row' }}>
                             <Image source={require('../../assets/icons/user.png')} style={{width: 40, height: 40, tintColor: '#5794ff'}} />
