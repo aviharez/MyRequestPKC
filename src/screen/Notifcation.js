@@ -4,18 +4,84 @@ import {
     View,
     Text,
     ScrollView,
+    TouchableOpacity,
+    Image
 } from 'react-native';
+
+import {ListItem} from 'react-native-elements';
+
+import Icon from 'react-native-vector-icons/Feather';
+import Card from '../component/Card';
 
 import {style} from '../../assets/styles/Style';
 
+import {Txt, TxtBold} from '../component/Text'; 
+
 export default class Notification extends Component {
+
+    _isMounted = false;
+
+    constructor(props) {
+        super(props);
+    }
+
+    componentDidMount() {
+        this._isMounted = true;
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
+    }
+
     render() {
+
+        const notif = [
+            {
+                id: '1',
+                title: 'Requestmu telah mendapat persetujuan',
+                date: 'today'
+            }, {
+                id: '2',
+                title: 'Ada request baru untukmu. Cek sekarang juga',
+                date: 'yesterday'
+            }, {
+                id: '3',
+                title: 'Yaahh requestmu ditolak',
+                date: '12 Des 2019'
+            }
+        ]
+
         return (
-            <View style={[style.mainContainer]}>
+            <View style={[style.mainContainer, { backgroundColor: '#fff' }]}>
                 <ScrollView>
                     <View>
                         <View style={s.headerContainer}>
+                            <View style={{  flex: 2 }} />
+                            <TxtBold style={s.headerText}>Notifications</TxtBold>
+                        </View>
 
+                        <View style={s.contentContainer}>
+                            <View style={{marginTop: 24, marginLeft: 16}}>
+                                {
+                                    notif.map((item, index) => {
+                                        let topDivider = index == 0 ? false : true
+                                        return (
+                                            <TouchableOpacity>
+                                                <ListItem
+                                                    key={index}
+                                                    title={item.title}
+                                                    titleStyle={{fontFamily: 'Product Sans Bold', fontSize: 14, color: 'rgba(0, 0, 0, .6)', marginLeft: -8}}
+                                                    subtitle={item.date}
+                                                    subtitleStyle={{ fontFamily: 'Product Sans', color: '#cccbc7', fontSize: 12, marginLeft: -8}}
+                                                    leftAvatar={{ source: require('../../assets/icons/user.png'), height: 28, width: 28, marginLeft: -16 }}
+                                                    topDivider={topDivider}
+                                                    style={{ margin: -4, marginTop: -4 }}
+                                                />
+                                            </TouchableOpacity>
+                                        )
+                                    })
+                                }
+                            </View>
                         </View>
                     </View>
                 </ScrollView>
@@ -26,7 +92,7 @@ export default class Notification extends Component {
 
 const s = StyleSheet.create({
     headerContainer: {
-        height: 200,
+        height: 170,
         padding: 16,
         flex: 1,
         flexDirection: 'column',
@@ -34,20 +100,48 @@ const s = StyleSheet.create({
         // borderWidth: 1,
         // borderColor: 'red',
     },
-    hdeaderSearchbar: {
-        flex: 1,
-        flexDirection: 'row'
-    },
-    headerUser: {
-        width: 48,
-        height: 48,
+    headerBackIcon: {
+        fontSize: 24,
+        color: '#fff',
     },
     headerText: {
-        fontSize: 20,
+        fontSize: 24,
         width: 250,
-        flex: 2,
+        flex: 1,
         color: '#fff',
-        top: 16,
-        fontWeight: 'bold'
+        marginTop: -16,
+        left: 8,
+    },
+    contentContainer: {
+        padding: 16,
+        marginTop: -20,
+        backgroundColor: '#fff',
+        borderTopStartRadius: 28
+    },
+    categoryColContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        marginHorizontal: -4,
+    },
+    categoryTiles: {
+        paddingVertical: 16,
+        margin: 4,
+    },
+    categoryIcon: {
+        width: 56,
+        height: 56,
+        alignSelf: 'center',
+    },
+    categoryTilesTitle: {
+        textAlign: 'center',
+        marginTop: 8,
+        fontSize: 13,
+    },
+    categorySectionTitle: {
+        marginTop: 8,
+    },
+    categorySectionSubtitle: {
+        marginTop: -4,
     },
 })
