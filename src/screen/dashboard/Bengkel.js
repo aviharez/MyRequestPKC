@@ -31,10 +31,10 @@ export default class Bengkel extends Component {
                 require('../../../assets/icons/bengkel/perpipaan.png'),
                 require('../../../assets/icons/bengkel/pertukangan.png'),
             ],
-            categoryData: [
-                'Permesinan',
-                'Perpipaan & Pengelasan',
-                'Pertukangan'
+            categoryId: [
+                'B1',
+                'B2',
+                'B3'
             ],
             refreshing: false,
         }
@@ -54,7 +54,7 @@ export default class Bengkel extends Component {
             return (
                 <View style={[style.col, style.col4]} key={index}>
                     <Card style={s.categoryTiles}>
-                        <TouchableOpacity onPress={() => this.props.navigation.navigate('FormPok', {subCategory: this.state.categoryData[index]})}>
+                        <TouchableOpacity onPress={() => this.props.navigation.navigate('FormPok', {subCategory: this.state.categoryTitle[index], subCategoryId: this.state.categoryId[index]})}>
                             <Image source={this.state.categoryIcon[index]} style={s.categoryIcon} />
                             <Text numberOfLines={1} style={s.categoryTilesTitle}>{title}</Text>
                         </TouchableOpacity>

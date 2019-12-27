@@ -60,7 +60,7 @@ export default class Menu extends Component {
                 'Laboratorium',
                 'KPK',
                 'Listrik',
-                'Layanan TIK',
+                'TIK',
                 'Inspeksi',
                 'Jasa Teknik',
                 'Process Engineering',

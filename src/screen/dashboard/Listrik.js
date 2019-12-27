@@ -31,10 +31,10 @@ export default class Listrik extends Component {
                 require('../../../assets/icons/listrik/luar.png'),
                 require('../../../assets/icons/listrik/bengkel.png'),
             ],
-            categoryData: [
-                'Pabrik',
-                'Luar Pabrik',
-                'Bengkel Listrik'
+            categoryId: [
+                'L1',
+                'L2',
+                'L3'
             ],
             refreshing: false,
         }
@@ -54,7 +54,7 @@ export default class Listrik extends Component {
             return (
                 <View style={[style.col, style.col4]} key={index}>
                     <Card style={s.categoryTiles}>
-                        <TouchableOpacity onPress={() => this.props.navigation.navigate(this.state.categoryData[index])}>
+                        <TouchableOpacity onPress={() => this.props.navigation.navigate('FormPok', {subCategory: this.state.categoryTitle[index], subCategoryId: this.state.categoryId[index]})}>
                             <Image source={this.state.categoryIcon[index]} style={s.categoryIcon} />
                             <Text numberOfLines={1} style={s.categoryTilesTitle}>{title}</Text>
                         </TouchableOpacity>
