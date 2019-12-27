@@ -32,9 +32,9 @@ export default class Bengkel extends Component {
                 require('../../../assets/icons/bengkel/pertukangan.png'),
             ],
             categoryId: [
-                'B1',
-                'B2',
-                'B3'
+                'S1',
+                'S2',
+                'S3'
             ],
             refreshing: false,
         }

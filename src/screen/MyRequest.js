@@ -37,7 +37,7 @@ export default class MyRequest extends React.Component {
             translateY: -1000,
             incomingRequest: null,
             outcomingRequest: null,
-            isLoading: true,
+            refreshing: false,
         }
 
         this.getRequest()
@@ -46,7 +46,7 @@ export default class MyRequest extends React.Component {
     getRequest = async () => {
         let nikSap = await AsyncStorage.getItem('nikSap')
         try {
-            this.setState({isLoading: true})
+            this.setState({refreshing: true})
             let response = await fetch(host + 'api/getOrderOutPok/' + nikSap)
             response = await response.json()
             this.setState({outcomingRequest: response})
@@ -58,7 +58,7 @@ export default class MyRequest extends React.Component {
             console.log(err)
         }
 
-        this.setState({isLoading: false})
+        this.setState({refreshing: false})
     }
 
     handleSlide = type => {
@@ -118,7 +118,7 @@ export default class MyRequest extends React.Component {
 
     render() {
 
-        const RequestList = ({id, name, deskripsi, prioritas, date, unitName, status}) => {
+        const RequestList = ({id, name, deskripsi, prioritas, date, unitName, status, viewOnly}) => {
 
             const prioritasBadgeBg = () => {
                 if (prioritas == 'E') {
@@ -161,7 +161,13 @@ export default class MyRequest extends React.Component {
             }
 
             return (
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('DetailRequest', {orderId: parseInt(id)})}>
+                <TouchableOpacity onPress={() => {
+                    if (viewOnly) {
+                        this.props.navigation.navigate('DetailRequest', {orderId: parseInt(id), viewOnly: true})
+                    } else {
+                        this.props.navigation.navigate('DetailRequest', {orderId: parseInt(id)})
+                    }
+                }}>
                     <View style={{ flexDirection: 'column', backgroundColor: '#fff', padding: 8 }}>
                         <View style={{ flexDirection: 'row' }}>
                             <Image source={require('../../assets/icons/user.png')} style={{width: 40, height: 40, tintColor: '#5794ff'}} />
@@ -213,14 +219,6 @@ export default class MyRequest extends React.Component {
             translateXTabTwo,
             translateY
         } = this.state;
-
-        const LoadingIndicator = () => {
-            if (this.state.isLoading) {
-                return (<ActivityIndicator size="large" />)
-            } else {
-                return null
-            }
-        }
 
         return (
             <View style={{ flex: 1 }}>
@@ -325,7 +323,6 @@ export default class MyRequest extends React.Component {
                             </TouchableOpacity>
                         </View>
                     </View>
-                    <LoadingIndicator/>
 
                     {/* <ScrollView> */}
                         <Animated.View
@@ -347,8 +344,14 @@ export default class MyRequest extends React.Component {
                             <FlatList
                                 data={this.state.outcomingRequest}
                                 renderItem={
-                                    ({item}) => <RequestList name={item.namaPegawai} deskripsi={item.deskripsi} prioritas={item.prioritas} date={item.tanggal} unitName={item.namaSubKategori} status={item.status} id={item.idOrderPok} />
+                                    ({item}) => <RequestList name={item.namaPegawai} deskripsi={item.deskripsi} prioritas={item.prioritas} date={item.tanggal} unitName={item.namaSubKategori} status={item.status} id={item.idOrderPok} viewOnly={true} />
                                 }
+                                refreshing={this.state.refreshing}
+                                onRefresh={() => {
+                                    this.setState({refreshing: true}, () => {
+                                        this.getRequest()
+                                    })
+                                }}
                                 keyExtractor={item => item.idOrderPok}
                                 contentContainerStyle={{paddingVertical: 8, paddingHorizontal: 16, width: width}} />
                         </Animated.View>
@@ -370,8 +373,14 @@ export default class MyRequest extends React.Component {
                             <FlatList
                                 data={this.state.incomingRequest}
                                 renderItem={
-                                    ({item}) => <RequestList name={item.namaPegawai} deskripsi={item.deskripsi} prioritas={item.prioritas} date={item.tanggal} unitName={item.unitName} status={item.status} id={item.idOrderPok} />
+                                    ({item}) => <RequestList name={item.namaPegawai} deskripsi={item.deskripsi} prioritas={item.prioritas} date={item.tanggal} unitName={item.unitName} status={item.status} id={item.idOrderPok} viewOnly={false} />
                                 }
+                                refreshing={this.state.refreshing}
+                                onRefresh={() => {
+                                    this.setState({refreshing: true}, () => {
+                                        this.getRequest()
+                                    })
+                                }}
                                 keyExtractor={item => item.idOrderPok}
                                 contentContainerStyle={{paddingVertical: 8, paddingHorizontal: 16, width: width}} />
                         </Animated.View>

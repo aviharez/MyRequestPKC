@@ -57,7 +57,6 @@ export default class FormPok extends Component {
         super(props);
 
         this.getUnitId();
-        console.log()
 
         this.state = {
             idSubKategori: this.props.navigation.getParam('subCategoryId'),
@@ -80,8 +79,8 @@ export default class FormPok extends Component {
     }
 
     submitData = async () => {
-        const {kode_mesin, deskripsi, prioritas, penghentianPabrik, dingin, panas, ...restState} = this.state;
-        if (!kode_mesin || !deskripsi || !prioritas) {
+        const {deskripsi, prioritas, dingin, panas} = this.state;
+        if (!deskripsi || !prioritas) {
             alert('Kode mesin, deskripsi, dan prioritas wajib diisi')
             return
         }
@@ -158,7 +157,7 @@ export default class FormPok extends Component {
 
                         <View style={s.contentContainer}>
                             <View style={{marginTop: 24, flexDirection: 'column'}}>
-                                <Txt>Kode Mesin</Txt>
+                                <Txt>Kode Mesin atau Peralatan</Txt>
                                 <TextInput
 							        style={s.textInput}
 							        placeholder="Kode Mesin"
@@ -166,11 +165,10 @@ export default class FormPok extends Component {
 							        onChangeText={(kode_mesin) => this.setState({kode_mesin})}
 							        value={this.state.kode_mesin}
 							        placeholderTextColor="#d3d4cf" />
-                                <Txt style={{ marginTop: 16 }}>Uraian dan deskripsi pekerjaan</Txt>
+                                <Txt style={{ marginTop: 16 }}>Uraian Pekerjaan yang Harus Dilakukan</Txt>
                                 <TextInput
 							        style={s.textArea}
 							        placeholder="Uraian dan deskripsi pekerjaan"
-							        autoCapitalize="none"
                                     multiline={true}
                                     numberOfLines={5}
                                     textAlignVertical={'top'}
@@ -242,8 +240,9 @@ const s = StyleSheet.create({
         width: 250,
         flex: 1,
         color: '#fff',
-        marginTop: -16,
-        left: 8,
+        position: 'absolute',
+        bottom: 30,
+        left: 24,
         fontWeight: 'bold',
     },
     contentContainer: {

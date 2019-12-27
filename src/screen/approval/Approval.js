@@ -6,52 +6,50 @@ import {
     TouchableOpacity,
     ScrollView,
     Dimensions,
-    Image
+    Image,
+    ActivityIndicator,
+    FlatList,
 } from 'react-native';
 
 import {style} from '../../../assets/styles/Style';
 
 import {Txt} from '../../component/Text';
 import Icon from 'react-native-vector-icons/Feather';
-import { FlatList } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-community/async-storage';
 import {host} from '../../config/ApiHost'
 
 const { width } = Dimensions.get("window")
 
-const DATA = [
-    {
-        id: '1',
-        name: 'Tes',
-        deskripsi: 'Ini adalah contoh sebuah deskripsi',
-        prioritas: 'E',
-        date: '2019-12-12',
-        unitName: 'Departemen Teknologi Informasi'
-    },
-    {
-        id: '2',
-        name: 'Tes',
-        deskripsi: 'Ini adalah contoh sebuah deskripsi',
-        prioritas: 'E',
-        date: '2019-12-12',
-        unitName: 'Departemen Teknologi Informasi'
-    }
-]
-
 export default class Approval extends Component {
+
     constructor(props) {
         super(props)
 
         this.state = {
-            data: null
+            refreshing: false,
+            data: null,
         }
+    }
 
-        this.getUnapproved()
+    componentDidMount() {
+        this.focusListener = [
+            this.props.navigation.addListener('didFocus', () => {
+                this.getUnapproved()
+            }),
+            this.props.navigation.addListener('willBlur', () => {
+                this.setState({data: null});
+            })
+        ];
+    }
+
+    componentWillUnmount() {
+        this.focusListener.forEach(listener => listener.remove());
     }
 
     getUnapproved = async () => {
         let unitId = await AsyncStorage.getItem('unitId')
         try {
+            this.setState({refreshing: true})
             let response = await fetch(host + 'api/getUnapprovedOrderPok/' + unitId)
             response = await response.json()
             this.setState({data: response})
@@ -60,6 +58,8 @@ export default class Approval extends Component {
             alert('Gagal mendapatkan data dari server')
             console.log(err)
         }
+
+        this.setState({refreshing: false})
     }
 
     render() {
@@ -133,31 +133,28 @@ export default class Approval extends Component {
 
         return (
             <View style={[style.mainContainer]}>
-                {/* <ScrollView> */}
-                    <View>
-                        <View style={{ flexDirection: 'row', marginVertical: 8, padding: 16 }}>
-                            <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                                <Icon name={'chevron-left'} style={{ fontSize: 24, alignSelf: 'center' }} />
-                            </TouchableOpacity>
-                            <Txt style={{ 
-                                fontSize: 24,
-                                color: '#000',
-                                fontWeight: 'bold',
-                                alignSelf: 'center'
-                            }}>Approve Request</Txt>
-                        </View>
+                <View style={{ flexDirection: 'row', marginVertical: 8, padding: 16 }}>
+                    <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
+                        <Icon name={'chevron-left'} style={{ fontSize: 24, alignSelf: 'center' }} />
+                    </TouchableOpacity>
+                    <Txt style={{ 
+                        fontSize: 24,
+                        color: '#333',
+                        fontWeight: 'bold',
+                        alignSelf: 'center'
+                    }}>Approve Request</Txt>
+                </View>
 
-                        <FlatList
-                                data={this.state.data}
-                                renderItem={
-                                    ({item}) => <RequestList name={item.namaPegawai} deskripsi={item.deskripsi} prioritas={item.prioritas} date={item.tanggal} unitName={item.namaSubKategori} id={item.idOrderPok} />
-                                }
-                                keyExtractor={item => item.id}
-                                contentContainerStyle={{paddingHorizontal: 8, width: width}} />
+                <FlatList
+                    data={this.state.data}
+                    renderItem={
+                        ({item}) => <RequestList name={item.namaPegawai} deskripsi={item.deskripsi} prioritas={item.prioritas} date={item.tanggal} unitName={item.namaSubKategori} status={item.status} id={item.idOrderPok} />
+                    }
+                    refreshing={this.state.refreshing}
+                    onRefresh={() => this.getUnapproved()}
+                    keyExtractor={item => item.idOrderPok}
+                    contentContainerStyle={{paddingHorizontal: 16, width: width}} />
 
-                    </View>
-                {/* </ScrollView> */}
-                
             </View>
         )
     }

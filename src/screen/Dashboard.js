@@ -59,11 +59,21 @@ export default class Dashboard extends Component {
                 'Bengkel',
                 'TIK',
                 'Listrik',
-                'Umum',
+                'FormPok',
                 'Konsumsi',
                 'Pinken',
                 'ATK',
                 'Lainnya',
+            ],
+            categoryNavigationParams: [
+                null,
+                null,
+                null,
+                'UM',
+                null,
+                null,
+                null,
+                null,
             ],
             latestRequest: null,
             refreshing: false,
@@ -151,7 +161,12 @@ export default class Dashboard extends Component {
             return (
                 <View style={[style.col, style.col3]} key={index}>
                     <Card style={s.categoryTiles}>
-                        <TouchableOpacity onPress={() => this.props.navigation.navigate(this.state.categoryNavigation[index])}>
+                        <TouchableOpacity onPress={() =>
+                            this.props.navigation.navigate(this.state.categoryNavigation[index], {
+                                subCategoryId: this.state.categoryNavigationParams[index],
+                                subCategory: this.state.categoryTitle[index]
+                            })
+                        }>
                             <Image source={this.state.categoryIcon[index]} style={s.categoryIcon} />
                             <Txt numberOfLines={1} style={s.categoryTilesTitle}>{title}</Txt>
                         </TouchableOpacity>
@@ -240,7 +255,7 @@ export default class Dashboard extends Component {
                                     horizontal={true}
                                     ListEmptyComponent={() => {
                                         if (!this.state.refreshing) {
-                                            return (<Txt>Tidak ada request</Txt>)
+                                            return (<Txt style={{marginLeft: 8}}>Tidak ada request</Txt>)
                                         } else {
                                             return null;
                                         }

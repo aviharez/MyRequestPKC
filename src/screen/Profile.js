@@ -20,7 +20,7 @@ export default class Profile extends Component {
         super(props)
 
         this.state = {
-            // namaPegawai: null,
+            isUnitHead: null,
         }
 
         this.getSession()
@@ -29,7 +29,8 @@ export default class Profile extends Component {
     getSession = async () => {
         let namaPegawai = await AsyncStorage.getItem('namaPegawai')
         let posTitle = await AsyncStorage.getItem('posTitle')
-        this.setState({namaPegawai: namaPegawai, posTitle: posTitle})
+        let isUnitHead = await AsyncStorage.getItem('isUnitHead')
+        this.setState({namaPegawai: namaPegawai, posTitle: posTitle, isUnitHead: isUnitHead})
     }
 
     signOut = () => {
@@ -55,14 +56,17 @@ export default class Profile extends Component {
                 title: 'Persetujuan Request Order',
                 icon: 'check-square',
                 onPress: () => this.props.navigation.navigate('Approval'),
+                display: this.state.isUnitHead == 'yes' ? 'flex' : 'none'
             }, {
                 title: 'Ubah Password',
                 icon: 'key',
                 onPress: () => null,
+                display: 'flex'
             }, {
                 title: 'Sign Out',
                 icon: 'log-out',
                 onPress: () => this.signOut(),
+                display: 'flex'
             }
         ]
 
@@ -87,16 +91,17 @@ export default class Profile extends Component {
                         </View>
                         {
                             menu.map((item, index) => {
-                                let topDivider = index == 0 ? false : true
+                                let bottomDivider = parseInt(index + 1) == menu.length ? false : true
                                 return (
                                     <TouchableOpacity>
                                         <ListItem
-                                            key={Math.floor(Math.random() * 1000000000)}
+                                            keyExtractor={Math.floor(Math.random() * 1000000000)}
                                             title={item.title}
                                             titleStyle={{fontFamily: 'Product Sans Bold', color: 'rgba(0, 0, 0, .6)'}}
                                             leftIcon={<Icon name={item.icon} type='feather' color='#5794ff' />}
-                                            topDivider={topDivider}
+                                            bottomDivider={bottomDivider}
                                             onPress={item.onPress}
+                                            style={{display: item.display}}
                                             chevron
                                         />
                                     </TouchableOpacity>

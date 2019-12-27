@@ -7,8 +7,7 @@ import {
     TouchableOpacity,
     Image,
     TextInput,
-    ActivityIndicator,
-    Alert,
+    ActivityIndicator
 } from 'react-native'
 import Icon from 'react-native-vector-icons/Feather'
 
@@ -30,7 +29,7 @@ export default class DetailRequest extends Component {
             isProcessing: false,
         }
 
-        this.getDetail()
+        this.getDetail();
     }
 
     getDetail = async () => {
@@ -41,8 +40,9 @@ export default class DetailRequest extends Component {
             response = await response.json()
             console.log(response)
             this.setState({data: response})
+            // console.log(this.state.data)
         } catch (err) {
-            alert('Gagal mendapatkan data dari server')
+            alert('Gagal mengambil data dari server')
             console.log(err)
         }
 
@@ -132,50 +132,6 @@ export default class DetailRequest extends Component {
             }
         }
 
-        const ButtonAction = (props) => {
-            if (this.props.navigation.getParam('viewOnly')) {
-                return null
-            } else {
-                return (
-                    <TouchableOpacity
-                        disabled={this.state.isLoading ? true : (this.state.isProcessing ? true : false)}
-                        onPress={
-                            () => {
-                                if (this.state.data.status == 4) {
-                                    return
-                                }
-                                Alert.alert(
-                                    'Konfirmasi',
-                                    'Anda yakin ingin memproses order ini?',
-                                    [
-                                        {text: 'Batal'},
-                                        {
-                                            text: 'OK',
-                                            onPress: () => {
-                                                if (this.state.data.status == 3) {
-                                                    this.updateStatus('finish')
-                                                } else if (this.state.data.status == 2) {
-                                                    this.updateStatus('accept')
-                                                } else if (this.state.data.status == 1) {
-                                                    this.updateStatus('approve')
-                                                } else {
-                                                    null
-                                                }
-                                            }
-                                        }
-                                    ],
-                                    {cancelable: false}
-                                )
-                            }
-                        }
-                        style={{marginRight: 12, marginTop: -38, alignSelf: 'flex-end'}}
-                    >
-                        {props.children}
-                    </TouchableOpacity>
-                )
-            }
-        }
-
         return (
             <View style={[style.mainContainer]}>
                 <ScrollView>
@@ -184,8 +140,8 @@ export default class DetailRequest extends Component {
                             <TouchableOpacity style={{flex: 2}} onPress={() => this.props.navigation.goBack()}>
                                 <Icon name={'chevron-left'} style={s.headerBackIcon} />
                             </TouchableOpacity>
-                            <View style={{ flex: 1, position: 'absolute', bottom: 36, left: 24 }}>
-                                <TxtBold style={s.headerText} numberOfLines={3}>{this.state.data.kode_mesin ? this.state.data.kode_mesin : '-'}</TxtBold>
+                            <View style={{ flex: 1, marginTop: -16, left: 8 }}>
+                                <TxtBold style={s.headerText}>{this.state.data.kode_mesin}</TxtBold>
                                 <Txt style={{fontSize: 18, color: '#fff'}}>{this.state.data.namaSubKategori}</Txt>
                             </View>
                             
@@ -193,7 +149,14 @@ export default class DetailRequest extends Component {
 
                         <View style={s.contentContainer}>
                             <View style={{flexDirection: 'column'}}>
-                                <ButtonAction>
+                                <TouchableOpacity
+                                    disabled={this.state.isLoading ? true : false}
+                                    onPress={
+                                        () =>
+                                            this.state.data.status == 3 ? this.updateStatus('finish') : (this.state.data.status == 2 ? this.updateStatus('accept') : (this.state.data.status == 1 ? this.updateStatus('approve') : null))
+                                    }
+                                    style={{marginRight: 12, marginTop: -38, alignSelf: 'flex-end'}}
+                                >
                                     <View style={{ 
                                         backgroundColor: '#ffaa0d', 
                                         width: 120, 
@@ -207,10 +170,10 @@ export default class DetailRequest extends Component {
                                             alignSelf: 'center',
                                             marginTop: 12
                                         }}>
-                                            {this.state.data.status == 3 ? 'Finish' : (this.state.data.status == 2 ? 'Accept' : (this.state.data.status == 1 ? 'Approve' : (this.state.data.status == 4 ? 'Finished' : null)))}
+                                            {this.state.data.status == 3 ? 'Finish' : (this.state.data.status == 2 ? 'Accept' : (this.state.data.status == 1 ? 'Approve' : 'Finished'))}
                                         </Txt>
                                     </View>
-                                </ButtonAction>
+                                </TouchableOpacity>
                                 <LoadingIndicator />
                                 <View style={{ padding: 16 }}>
                                     <Txt style={{ fontSize: 16, marginTop: 16 }}>{this.state.data.deskripsi}</Txt>
