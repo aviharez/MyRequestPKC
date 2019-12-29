@@ -13,7 +13,8 @@ import {
 	TouchableOpacity,
 	ImageBackground,
 	ActivityIndicator,
-	StatusBar
+	StatusBar,
+	ToastAndroid,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {createStackNavigator} from 'react-navigation-stack';
@@ -103,6 +104,28 @@ export default class LoginPage extends Component {
 			response = await response.json();
 
 			if (response.status == 'success') {
+				const fcmToken = await AsyncStorage.getItem('fcmToken')
+				let tokenResponse = await fetch(host + "api/submitDeviceToken", {
+					method: "POST",
+					body: JSON.stringify({
+						"deviceToken": fcmToken,
+						"nikSap": this.state.username
+					})
+				});
+
+				tokenResponse = await tokenResponse.json();
+				message = null;
+				if (tokenResponse.status == 'tokenValid') {
+					message = "Token valid";
+				} else if (tokenResponse.status == 'insertSuccess') {
+					message = "Device token saved";
+				} else if (tokenResponse.status == 'nikSapUpdated') {
+					message = 'Token is already exist, old nikSap replaced';
+				} else {
+					message = 'Something went wrong when processing device token';
+				}
+				ToastAndroid.show(message, ToastAndroid.SHORT);
+
 				await AsyncStorage.multiSet([
 					['logged', 'yes'],
 					['nikSap', response.nikSap],
@@ -120,6 +143,7 @@ export default class LoginPage extends Component {
 				this.setState({password: null});
 			}
 		} catch (err) {
+			console.log(err)
 			alert('Gagal memproses login, silakan periksa koneksi internet anda');
 		}
 

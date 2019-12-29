@@ -11,23 +11,61 @@ import {
 import {
     createSwitchNavigator,
     createAppContainer
-} from 'react-navigation';
-import AsyncStorage from '@react-native-community/async-storage';
+} from 'react-navigation'
+import AsyncStorage from '@react-native-community/async-storage'
+import firebase from '@react-native-firebase/app'
+import messaging from '@react-native-firebase/messaging'
 
-import bg from './assets/images/brainstorming-campaign-collaborate-6224.jpg';
-import logo from './assets/images/logo.png';
-import {Txt} from './src/component/Text';
+import bg from './assets/images/brainstorming-campaign-collaborate-6224.jpg'
+import logo from './assets/images/logo.png'
+import {Txt} from './src/component/Text'
 
-import loginScreen from './src/screen/Login.js';
-import routerScreen from './src/Router.js';
-
-const userInfo = {username: 'admin', password: 'admin'};
+import loginScreen from './src/screen/Login.js'
+import routerScreen from './src/Router.js'
 
 class AuthLoadingScreen extends Component {
     constructor(props) {
-        super(props);
-		this._loadData();
-    }
+		super(props);
+		
+		this.checkPermission()
+		this._loadData()
+	}
+	
+	checkPermission = async () => {
+		const enabled = await firebase.messaging().hasPermission()
+
+		if (enabled) {
+			this.getToken()
+		} else {
+			this.requestPermission()
+		}
+	}
+
+	getToken = async () => {
+		let fcmToken = await AsyncStorage.getItem('fcmToken');
+
+		if (!fcmToken) {
+			fcmToken = await firebase.messaging().getToken();
+
+			if (fcmToken) {
+				// User has device token
+				await AsyncStorage.setItem('fcmToken', fcmToken);
+			}
+		}
+
+		console.log(await AsyncStorage.getItem('fcmToken'))
+	}
+
+	requestPermission = async () => {
+		try {
+			await firebase.messaging().requestPermission();
+
+			// User authorized
+			this.getToken();
+		} catch (err) {
+			console.log('Permission rejected');
+		}
+	}
 
     render() {
         return (

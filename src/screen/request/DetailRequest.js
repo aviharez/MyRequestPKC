@@ -39,7 +39,6 @@ export default class DetailRequest extends Component {
             this.setState({isLoading: true})
             let response = await fetch(host + 'api/getDetailOrderPok/' + idOrderPok)
             response = await response.json()
-            console.log(response)
             this.setState({data: response})
         } catch (err) {
             alert('Gagal mendapatkan data dari server')
@@ -81,16 +80,47 @@ export default class DetailRequest extends Component {
             })
             response = await response.json()
             if (response.status == 'success') {
-                await alert('Proses berhasil')
-            } else {
-                await alert('Proses gagal')
-            }
-        } catch (err) {
-            await alert('Proses gagal')
-            console.log(err)
-        }
+                
+                // If approve request, then send notification to all pic devices
+                if (statusData == 'approve') {
+                    let tokens = []
+                    for (var key in response.deviceToken) {
+                        if (response.deviceToken.hasOwnProperty(key)) {
+                            tokens.push(response.deviceToken[key])
+                        }
+                    }
+                    const message = {
+                        "registration_ids": tokens,
+                        "notification": {
+                            "body": "Ada request baru menunggu untuk anda eksekusi",
+                            "title": "Request Baru Diterima"
+                        }
+                    }
+                    let headers = new Headers({
+                        "Authorization": "key=AAAA9tGDLy4:APA91bHRrcgqxRYkJ9N8vRWqmT3vvnuNm2LddVqr7N9b5CdEfWCzAgsaFyYKEsCoVR1pNEExJcll_pKX9QibBGJPmGmJwJL6gA2nwkSXbQVqvwvvXNrk6iclGx-RFTkFORsMpam70iUL",
+                        "Content-Type": "application/json"
+                    })
+                    let fcmResponse = await fetch("https://fcm.googleapis.com/fcm/send", {
+                        method: "POST",
+                        headers,
+                        body: JSON.stringify(message)
+                    })
+                    fcmResponse = fcmResponse.json()
+                    console.log(fcmResponse)
+                }
 
-        this.props.navigation.goBack()
+                await alert('Request berhasil diupdate')
+            } else {
+                await alert('Request gagal diupdate')
+            }
+
+            this.props.navigation.goBack()
+        } catch (err) {
+            await alert('Request gagal diupdate')
+            console.log(err)
+
+            this.props.navigation.goBack()
+        }
     }
 
     render() {

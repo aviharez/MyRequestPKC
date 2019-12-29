@@ -114,8 +114,32 @@ export default class FormPok extends Component {
 
             response = await response.json()
             if (response.status == 'success') {
+                let tokens = []
+                for (var key in response.unitHeadDeviceToken) {
+                    if (response.unitHeadDeviceToken.hasOwnProperty(key)) {
+                        tokens.push(response.unitHeadDeviceToken[key])
+                    }
+                }
+                const message = {
+                    "registration_ids": tokens,
+                    "notification": {
+                        "body": "Ada request baru menunggu persetujuan anda untuk diteruskan ke eksekutor",
+                        "title": "Menunggu Persetujuan"
+                    }
+                }
+                let headers = new Headers({
+                    "Content-Type": "application/json",
+                    "Authorization": "key=AAAA9tGDLy4:APA91bHRrcgqxRYkJ9N8vRWqmT3vvnuNm2LddVqr7N9b5CdEfWCzAgsaFyYKEsCoVR1pNEExJcll_pKX9QibBGJPmGmJwJL6gA2nwkSXbQVqvwvvXNrk6iclGx-RFTkFORsMpam70iUL"
+                })
+                let fcmResponse = await fetch("https://fcm.googleapis.com/fcm/send", {
+                    method: "POST",
+                    headers,
+                    body: JSON.stringify(message)
+                })
+                fcmResponse = fcmResponse.json()
+                console.log(fcmResponse)
+
                 this.setState({isProcessing: false})
-                let picDeviceToken = response.picDeviceToken
                 const resetAction = StackActions.reset({
                     index: 0,
                     actions: [NavigationActions.navigate({routeName: 'Dashboard'})]
