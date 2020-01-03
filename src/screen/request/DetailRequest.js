@@ -80,38 +80,73 @@ export default class DetailRequest extends Component {
             })
             response = await response.json()
             if (response.status == 'success') {
-                
-                // If approve request, then send notification to all pic devices
+                // Notify requester that their request has been approved or accepted or finished
+                let tokens = []
+                for (var key in response.deviceTokenPemohon) {
+                    if (response.deviceTokenPemohon.hasOwnProperty(key)) {
+                        tokens.push(response.deviceTokenPemohon[key])
+                    }
+                }
+                let body, title
                 if (statusData == 'approve') {
+                    body = 'Order anda telah disetujui oleh atasan anda dan telah diteruskan ke eksekutor'
+                    title = 'Order Anda Disetujui'
+                } else if (statusData == 'accept') {
+                    body = 'Order anda telah diterima oleh eksekutor dan sedang dalam pengerjaan'
+                    title = 'Order Anda Diterima'
+                } else if (statusData == 'finished') {
+                    body = 'Order anda telah diselesaikan oleh eksekutor'
+                    title = 'Order Telah Selesai'
+                }
+                const headers = new Headers({
+                    "Authorization": "key=AAAA9tGDLy4:APA91bHRrcgqxRYkJ9N8vRWqmT3vvnuNm2LddVqr7N9b5CdEfWCzAgsaFyYKEsCoVR1pNEExJcll_pKX9QibBGJPmGmJwJL6gA2nwkSXbQVqvwvvXNrk6iclGx-RFTkFORsMpam70iUL",
+                    "Content-Type": "application/json"
+                })
+                let message = {
+                    "registration_ids": tokens,
+                    "notification": {
+                        "body": body,
+                        "title": title
+                    }
+                }
+                let fcmResponse = await fetch("https://fcm.googleapis.com/fcm/send", {
+                    method: "POST",
+                    headers,
+                    body: JSON.stringify(message)
+                })
+
+                fcmResponse = fcmResponse.json()
+                console.log(fcmResponse)
+
+                // If statusData is approve request, then send notification to pics device
+                if (statusData == 'approve') {
+                    // Notify executor that new request has been approved
                     let tokens = []
                     for (var key in response.deviceToken) {
                         if (response.deviceToken.hasOwnProperty(key)) {
                             tokens.push(response.deviceToken[key])
                         }
                     }
-                    const message = {
+                    let message = {
                         "registration_ids": tokens,
                         "notification": {
                             "body": "Ada request baru menunggu untuk anda eksekusi",
                             "title": "Request Baru Diterima"
                         }
                     }
-                    let headers = new Headers({
-                        "Authorization": "key=AAAA9tGDLy4:APA91bHRrcgqxRYkJ9N8vRWqmT3vvnuNm2LddVqr7N9b5CdEfWCzAgsaFyYKEsCoVR1pNEExJcll_pKX9QibBGJPmGmJwJL6gA2nwkSXbQVqvwvvXNrk6iclGx-RFTkFORsMpam70iUL",
-                        "Content-Type": "application/json"
-                    })
                     let fcmResponse = await fetch("https://fcm.googleapis.com/fcm/send", {
                         method: "POST",
                         headers,
                         body: JSON.stringify(message)
                     })
+
                     fcmResponse = fcmResponse.json()
                     console.log(fcmResponse)
                 }
 
-                await alert('Request berhasil diupdate')
+                await alert('Status order berhasil diperbaharui')
             } else {
-                await alert('Request gagal diupdate')
+                await alert('Status order gagal diperbaharui')
             }
 
             this.props.navigation.goBack()
