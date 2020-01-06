@@ -168,7 +168,7 @@ export default class MyRequest extends React.Component {
                         this.props.navigation.navigate('DetailRequest', {orderId: parseInt(id)})
                     }
                 }}>
-                    <View style={{ flexDirection: 'column', backgroundColor: '#fff', padding: 8 }}>
+                    <View style={{ flexDirection: 'column', backgroundColor: '#fff', padding: 8, flex: 1 }}>
                         <View style={{ flexDirection: 'row' }}>
                             <Image source={require('../../assets/icons/user.png')} style={{width: 40, height: 40, tintColor: '#5794ff'}} />
                             <View style={{ flexDirection: 'column', marginLeft: 8,}}>
@@ -221,7 +221,7 @@ export default class MyRequest extends React.Component {
         } = this.state;
 
         return (
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, marginBottom: 100}}>
                 <View>
                     <View style={{ flexDirection: 'column', width: "90%",
                         marginLeft: "auto",
@@ -323,8 +323,7 @@ export default class MyRequest extends React.Component {
                             </TouchableOpacity>
                         </View>
                     </View>
-
-                    {/* <ScrollView> */}
+                    
                         <Animated.View
                             style={{
                                 justifyContent: "center",
@@ -342,6 +341,7 @@ export default class MyRequest extends React.Component {
                             }
                         >
                             <FlatList
+                                scrollEnabled={true}
                                 data={this.state.outcomingRequest}
                                 renderItem={
                                     ({item}) => <RequestList name={item.namaPegawai} deskripsi={item.deskripsi} prioritas={item.prioritas} date={item.tanggal} unitName={item.namaSubKategori} status={item.status} id={item.idOrderPok} viewOnly={true} />
@@ -371,6 +371,7 @@ export default class MyRequest extends React.Component {
                             }}
                         >
                             <FlatList
+                                scrollEnabled={true}
                                 data={this.state.incomingRequest}
                                 renderItem={
                                     ({item}) => <RequestList name={item.namaPegawai} deskripsi={item.deskripsi} prioritas={item.prioritas} date={item.tanggal} unitName={item.unitName} status={item.status} id={item.idOrderPok} viewOnly={false} />
@@ -384,7 +385,7 @@ export default class MyRequest extends React.Component {
                                 keyExtractor={item => item.idOrderPok}
                                 contentContainerStyle={{paddingVertical: 8, paddingHorizontal: 16, width: width}} />
                         </Animated.View>
-                    {/* </ScrollView> */}
+                    
                 </View>
             </View>
         );
