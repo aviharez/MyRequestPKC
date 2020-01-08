@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
     View,
     Text,
@@ -9,16 +9,17 @@ import {
     Dimensions,
     FlatList,
     TouchableNativeFeedback,
-    ActivityIndicator
+    ActivityIndicator,
+    StyleSheet,
 } from 'react-native'
-import Icon from 'react-native-vector-icons/Feather'
-import AsyncStorage from "@react-native-community/async-storage"
+import {Icon} from 'react-native-elements'
+import AsyncStorage from '@react-native-community/async-storage'
 
 import {Txt} from '../component/Text'
 import {style} from '../../assets/styles/Style'
 import {host} from '../../src/config/ApiHost'
 
-const { width } = Dimensions.get("window")
+const { width } = Dimensions.get('window')
 
 export default class MyRequest extends React.Component {
 
@@ -38,19 +39,27 @@ export default class MyRequest extends React.Component {
             incomingRequest: null,
             outcomingRequest: null,
             refreshing: false,
+            isSearching: null,
         }
-
-        this.getRequest()
     }
 
     getRequest = async () => {
         let nikSap = await AsyncStorage.getItem('nikSap')
         try {
             this.setState({refreshing: true})
-            let response = await fetch(host + 'api/getOrderOutPok/' + nikSap)
+            let response
+            if (this.state.isSearching) {
+                response = await fetch(encodeURI(host + 'api/getOrderOutPok/' + nikSap + '?q=' + this.props.navigation.getParam('q')))
+            } else {
+                response = await fetch(encodeURI(host + 'api/getOrderOutPok/' + nikSap))
+            }
             response = await response.json()
             this.setState({outcomingRequest: response})
-            response = await fetch(host + 'api/getOrderInPok/' + nikSap)
+            if (this.state.isSearching) {
+                response = await fetch(encodeURI(host + 'api/getOrderInPok/' + nikSap + '?q=' + this.props.navigation.getParam('q')))
+            } else {
+                response = await fetch(encodeURI(host + 'api/getOrderInPok/' + nikSap))
+            }
             response = await response.json()
             this.setState({incomingRequest: response})
         } catch (err) {
@@ -103,7 +112,14 @@ export default class MyRequest extends React.Component {
         this._isMounted = true;
         this.focusListener = [
             this.props.navigation.addListener('didFocus', () => {
+                if (this.props.navigation.getParam('q') !== undefined && this.props.navigation.getParam('q') !== null) {
+                    this.setState({isSearching: true})
+                } else {
+                    this.setState({isSearching: false})
+                }
                 this.getRequest()
+                console.log(this.props.navigation.getParam('q'))
+                console.log(this.state.isSearching)
             }),
             this.props.navigation.addListener('willBlur', () => {
                 this.setState({incomingRequest: null, outcomingRequest: null});
@@ -147,7 +163,7 @@ export default class MyRequest extends React.Component {
             }
 
             const dateFormat = (date) => {
-                const months = ["Jan", "Feb", "Mar","Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"]
+                const months = ['Jan', 'Feb', 'Mar','Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des']
                 let requestDate = date.substr(0, 10)
                 requestDate = requestDate.split('-')
                 let newDate = new Date(
@@ -155,7 +171,7 @@ export default class MyRequest extends React.Component {
                     parseInt(requestDate[1]) - 1,
                     parseInt(requestDate[2])
                 );
-                let formattedDate = months[newDate.getMonth()] + " " + newDate.getDate() + ", " + newDate.getFullYear()
+                let formattedDate = months[newDate.getMonth()] + ' ' + newDate.getDate() + ', ' + newDate.getFullYear()
 
                 return formattedDate;
             }
@@ -200,7 +216,7 @@ export default class MyRequest extends React.Component {
                         <View style={{ flexDirection: 'column', marginStart: 48 }}>
                             <Txt numberOfLines={2} style={{ fontSize: 15 }}>{deskripsi}</Txt>
                             <View style={{ flexDirection: 'row', marginTop: 8 }}>
-                                <Icon name={'target'} style={{ height: 14, width: 14, color: '#cccbc7'}} />
+                                <Icon name='target' type='feather' size={14} color='#cccbc7' containerStyle={{top: -1}} />
                                 <Txt style={{ fontSize: 12, color: '#cccbc7', marginLeft: 2 }}>{unitName}</Txt>
                             </View>
                         </View>
@@ -208,6 +224,35 @@ export default class MyRequest extends React.Component {
                 </TouchableOpacity>
             )
 
+        }
+
+        const SearchBadge = () => {
+            if (this.state.isSearching) {
+                const removeParam = () => {
+                    this.props.navigation.setParams({q: null})
+                    this.setState({isSearching: false})
+                    this.getRequest()
+                }
+                return (
+                    <View style={{justifyContent: 'flex-start', flexDirection: 'row'}}>
+                        <View style={s.searchBadge}>
+                            <Text style={{color: '#666'}}>{this.props.navigation.getParam('q')}</Text>
+                            <TouchableOpacity onPress={() => removeParam()}>
+                                <Icon
+                                    name='x'
+                                    type='feather'
+                                    reverse
+                                    color='#fafafa'
+                                    reverseColor='#666'
+                                    size={8}
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                )
+            } else {
+                return null
+            }
         }
 
         let {
@@ -221,173 +266,185 @@ export default class MyRequest extends React.Component {
         } = this.state;
 
         return (
-            <View style={{ flex: 1, marginBottom: 100}}>
-                <View>
-                    <View style={{ flexDirection: 'column', width: "90%",
-                        marginLeft: "auto",
-                        marginRight: "auto" }}>
-                        <Txt style={{ 
-                            fontSize: 24,
-                            color: '#000',
-                            top: 16,
-                            fontWeight: 'bold',
-                            marginBottom: 16,
-                            marginTop: 8
-                        }}>My Request</Txt>
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                marginTop: 30,
-                                marginBottom: 20,
-                                height: 40,
-                                position: "relative"
-                            }}
-                        >
-                            <Animated.View
-                                style={{
-                                    position: "absolute",
-                                    width: "50%",
-                                    height: "100%",
-                                    top: 0,
-                                    left: 0,
-                                    backgroundColor: "#007aff",
-                                    borderRadius: 4,
-                                    transform: [
-                                        {
-                                            translateX
-                                        }
-                                    ]
-                                }}
-                            />
-                            <TouchableOpacity
-                                style={{
-                                    flex: 1,
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    borderWidth: 1,
-                                    borderColor: "#007aff",
-                                    borderRadius: 4,
-                                    borderRightWidth: 0,
-                                    borderTopRightRadius: 0,
-                                    borderBottomRightRadius: 0
-                                }}
-                                onLayout={event =>
-                                    this.setState({
-                                        xTabOne: event.nativeEvent.layout.x
-                                    })
-                                }
-                                onPress={() =>
-                                    this.setState({ active: 0 }, () =>
-                                        this.handleSlide(xTabOne)
-                                    )
-                                }
-                            >
-                                <Text
-                                    style={{
-                                        color: active === 0 ? "#fff" : "#007aff"
-                                    }}
-                                >
-                                    Keluar
-                                </Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={{
-                                    flex: 1,
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    borderWidth: 1,
-                                    borderColor: "#007aff",
-                                    borderRadius: 4,
-                                    borderLeftWidth: 0,
-                                    borderTopLeftRadius: 0,
-                                    borderBottomLeftRadius: 0
-                                }}
-                                onLayout={event =>
-                                    this.setState({
-                                        xTabTwo: event.nativeEvent.layout.x
-                                    })
-                                }
-                                onPress={() =>
-                                    this.setState({ active: 1 }, () =>
-                                        this.handleSlide(xTabTwo)
-                                    )
-                                }
-                            >
-                                <Text
-                                    style={{
-                                        color: active === 1 ? "#fff" : "#007aff"
-                                    }}
-                                >
-                                    Masuk
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                    
+            <View style={{flex: 1}}>
+                <View style={{
+                    width: '90%',
+                    // height: 280,
+                    marginLeft: 'auto',
+                    marginRight: 'auto',
+                    flexDirection: 'column',
+                }}>
+                    <Txt style={{ 
+                        fontSize: 24,
+                        color: '#000',
+                        top: 16,
+                        fontWeight: 'bold',
+                        marginVertical: 8,
+                    }}>My Request</Txt>
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            marginTop: 30,
+                            height: 40,
+                            position: 'relative'
+                        }}
+                    >
                         <Animated.View
                             style={{
-                                justifyContent: "center",
-                                alignItems: "center",
+                                position: 'absolute',
+                                width: '50%',
+                                height: '100%',
+                                top: 0,
+                                left: 0,
+                                backgroundColor: '#007aff',
+                                borderRadius: 4,
                                 transform: [
                                     {
-                                        translateX: translateXTabOne
+                                        translateX
                                     }
                                 ]
+                            }}
+                        />
+                        <TouchableOpacity
+                            style={{
+                                flex: 1,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                borderWidth: 1,
+                                borderColor: '#007aff',
+                                borderRadius: 4,
+                                borderRightWidth: 0,
+                                borderTopRightRadius: 0,
+                                borderBottomRightRadius: 0
                             }}
                             onLayout={event =>
                                 this.setState({
-                                    translateY: event.nativeEvent.layout.height
+                                    xTabOne: event.nativeEvent.layout.x
                                 })
                             }
+                            onPress={() =>
+                                this.setState({ active: 0 }, () =>
+                                    this.handleSlide(xTabOne)
+                                )
+                            }
                         >
-                            <FlatList
-                                scrollEnabled={true}
-                                data={this.state.outcomingRequest}
-                                renderItem={
-                                    ({item}) => <RequestList name={item.namaPegawai} deskripsi={item.deskripsi} prioritas={item.prioritas} date={item.tanggal} unitName={item.namaSubKategori} status={item.status} id={item.idOrderPok} viewOnly={true} />
-                                }
-                                refreshing={this.state.refreshing}
-                                onRefresh={() => {
-                                    this.setState({refreshing: true}, () => {
-                                        this.getRequest()
-                                    })
+                            <Text
+                                style={{
+                                    color: active === 0 ? '#fff' : '#007aff'
                                 }}
-                                keyExtractor={item => item.idOrderPok}
-                                contentContainerStyle={{paddingVertical: 8, paddingHorizontal: 16, width: width}} />
-                        </Animated.View>
-
-                        <Animated.View
+                            >
+                                Keluar
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
                             style={{
-                                justifyContent: "center",
-                                alignItems: "center",
-                                transform: [
-                                    {
-                                        translateX: translateXTabTwo
-                                    },
-                                    {
-                                        translateY: -translateY
-                                    }
-                                ]
+                                flex: 1,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                borderWidth: 1,
+                                borderColor: '#007aff',
+                                borderRadius: 4,
+                                borderLeftWidth: 0,
+                                borderTopLeftRadius: 0,
+                                borderBottomLeftRadius: 0
                             }}
+                            onLayout={event =>
+                                this.setState({
+                                    xTabTwo: event.nativeEvent.layout.x
+                                })
+                            }
+                            onPress={() =>
+                                this.setState({ active: 1 }, () =>
+                                    this.handleSlide(xTabTwo)
+                                )
+                            }
                         >
-                            <FlatList
-                                scrollEnabled={true}
-                                data={this.state.incomingRequest}
-                                renderItem={
-                                    ({item}) => <RequestList name={item.namaPegawai} deskripsi={item.deskripsi} prioritas={item.prioritas} date={item.tanggal} unitName={item.unitName} status={item.status} id={item.idOrderPok} viewOnly={false} />
-                                }
-                                refreshing={this.state.refreshing}
-                                onRefresh={() => {
-                                    this.setState({refreshing: true}, () => {
-                                        this.getRequest()
-                                    })
+                            <Text
+                                style={{
+                                    color: active === 1 ? '#fff' : '#007aff'
                                 }}
-                                keyExtractor={item => item.idOrderPok}
-                                contentContainerStyle={{paddingVertical: 8, paddingHorizontal: 16, width: width}} />
-                        </Animated.View>
-                    
+                            >
+                                Masuk
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                    <SearchBadge/>
                 </View>
+                
+                <View style={{flex: 1,}}>
+                    <Animated.View
+                        style={{
+                            transform: [
+                                {
+                                    translateX: translateXTabOne
+                                }
+                            ],
+                            width: width,
+                            marginTop: 8,
+                        }}
+                        onLayout={event =>
+                            this.setState({
+                                translateY: event.nativeEvent.layout.height
+                            })
+                        }
+                    >
+                        <FlatList
+                            data={this.state.outcomingRequest}
+                            renderItem={
+                                ({item}) => <RequestList name={item.namaPegawai} deskripsi={item.deskripsi} prioritas={item.prioritas} date={item.tanggal} unitName={item.namaSubKategori} status={item.status} id={item.idOrderPok} viewOnly={true} />
+                            }
+                            refreshing={this.state.refreshing}
+                            onRefresh={() => {
+                                this.setState({refreshing: true}, () => {
+                                    this.getRequest()
+                                })
+                            }}
+                            keyExtractor={item => item.idOrderPok}
+                            contentContainerStyle={{}} />
+                    </Animated.View>
+
+                    <Animated.View
+                        style={{
+                            transform: [
+                                {
+                                    translateX: translateXTabTwo
+                                },
+                                {
+                                    translateY: -translateY
+                                }
+                            ],
+                            width: width,
+                            marginTop: 8,
+                        }}
+                    >
+                        <FlatList
+                            data={this.state.incomingRequest}
+                            renderItem={
+                                ({item}) => <RequestList name={item.namaPegawai} deskripsi={item.deskripsi} prioritas={item.prioritas} date={item.tanggal} unitName={item.unitName} status={item.status} id={item.idOrderPok} viewOnly={false} />
+                            }
+                            refreshing={this.state.refreshing}
+                            onRefresh={() => {
+                                this.setState({refreshing: true}, () => {
+                                    this.getRequest()
+                                })
+                            }}
+                            keyExtractor={item => item.idOrderPok}
+                            contentContainerStyle={{}} />
+                    </Animated.View>
+                </View>
+                
             </View>
         );
     }
 }
+
+const s = StyleSheet.create({
+    searchBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 8,
+        paddingStart: 10,
+        backgroundColor: 'rgba(0, 0, 0, .05)',
+        borderRadius: 24,
+    }
+})

@@ -24,6 +24,7 @@ import {style} from '../../assets/styles/Style'
 
 import Card from '../component/Card'
 import {Txt} from '../component/Text'
+import { NavigationActions } from 'react-navigation';
 
 const {width: WIDTH} = Dimensions.get('window')
 
@@ -193,8 +194,7 @@ export default class Dashboard extends Component {
                             <View style={s.bgOverlay} />
                             
                             <View style={s.hdeaderSearchbar}>
-                                <TouchableOpacity>
-                                    {/* <Image source={require('../../assets/icons/user.png')} style={s.headerUser} /> */}
+                                <TouchableOpacity onPress={() => this.props.navigation.navigate('Profile')}>
                                     <Icon
                                         name='user'
                                         type='feather'
@@ -208,7 +208,17 @@ export default class Dashboard extends Component {
                                 <View>
                                     <TextInput
 							            style={s.textInput}
-							            placeholder="Cari request di sini"
+							            placeholder="Cari berdasarkan deskripsi"
+                                        returnKeyType="go"
+                                        onSubmitEditing={() => {
+                                            this.setState({requestQuery: null})
+                                            this.props.navigation.navigate('MyRequest', {}, NavigationActions.navigate({
+                                                routeName: 'MyRequest',
+                                                params: {
+                                                    q: this.state.requestQuery
+                                                }
+                                            }))}
+                                        }
 							            autoCapitalize="none"
 							            onChangeText={(requestQuery) => this.setState({requestQuery})}
 							            value={this.state.requestQuery}

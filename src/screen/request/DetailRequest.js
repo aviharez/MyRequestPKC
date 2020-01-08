@@ -49,6 +49,7 @@ export default class DetailRequest extends Component {
     }
 
     updateStatus = async (statusData) => {
+        // Preparation
         let nikSap = await AsyncStorage.getItem('nikSap')
         let idOrderPok = this.props.navigation.getParam('orderId')
         let updateData = null
@@ -216,13 +217,13 @@ export default class DetailRequest extends Component {
                                         {text: 'Batal'},
                                         {
                                             text: 'OK',
-                                            onPress: () => {
+                                            onPress: async () => {
                                                 if (this.state.data.status == 3) {
-                                                    this.updateStatus('finish')
+                                                    await this.updateStatus('finish')
                                                 } else if (this.state.data.status == 2) {
-                                                    this.updateStatus('accept')
+                                                    await this.updateStatus('accept')
                                                 } else if (this.state.data.status == 1) {
-                                                    this.updateStatus('approve')
+                                                    await this.updateStatus('approve')
                                                 } else {
                                                     null
                                                 }
@@ -246,7 +247,7 @@ export default class DetailRequest extends Component {
                 <ScrollView>
                     <View>
                         <View style={s.headerContainer}>
-                            <TouchableOpacity style={{flex: 2}} onPress={() => this.props.navigation.goBack()}>
+                            <TouchableOpacity style={{width: 30}} onPress={() => this.props.navigation.goBack()}>
                                 <Icon name={'chevron-left'} style={s.headerBackIcon} />
                             </TouchableOpacity>
                             <View style={{ flex: 1, position: 'absolute', bottom: 36, left: 24 }}>

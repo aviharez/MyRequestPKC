@@ -29,6 +29,17 @@ class AuthLoadingScreen extends Component {
 		
 		this.checkPermission()
 		this._loadData()
+		this.notificationListener()
+	}
+
+	notificationListener = async () => {
+		this.messageListener = firebase.messaging().onMessage(async (message) => {
+			alert(JSON.stringify(message))
+		})
+
+		this.notificationListener = firebase.messaging().onMessage((message) => {
+			console.log(JSON.stringify(message))
+		})
 	}
 	
 	checkPermission = async () => {
