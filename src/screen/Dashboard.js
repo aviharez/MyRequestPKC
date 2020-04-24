@@ -1,38 +1,36 @@
-import React, {Component} from 'react';
+import React from 'react'
 import {
     StyleSheet,
     View,
-    Text,
     Image,
     TouchableOpacity,
-    Animated,
     ScrollView,
     FlatList,
     ImageBackground,
     TextInput,
     Dimensions,
     ActivityIndicator
-} from 'react-native';
+} from 'react-native'
 import {Icon} from 'react-native-elements'
 import AsyncStorage from '@react-native-community/async-storage'
-import FeatherIcon from 'react-native-vector-icons/Feather'
 
 import bg from '../../assets/images/dashboard-bg.jpg'
 import img from '../../assets/images/banner-bg.jpg'
 import {host} from '../config/ApiHost'
 import {style} from '../../assets/styles/Style'
+import Global from '../config/Global'
 
 import Card from '../component/Card'
 import {Txt} from '../component/Text'
-import { NavigationActions } from 'react-navigation';
+import { NavigationActions } from 'react-navigation'
 
 const {width: WIDTH} = Dimensions.get('window')
 
-export default class Dashboard extends Component {
-    _isMounted = false;
+export default class Dashboard extends React.PureComponent {
+    hasMounted = false
 
     constructor(props) {
-        super(props);
+        super(props)
 
         this.state = {
             requestQuery: '',
@@ -51,8 +49,8 @@ export default class Dashboard extends Component {
                 require('../../assets/icons/menu/monitor.png'),
                 require('../../assets/icons/menu/lightning_bolt_2.png'),
                 require('../../assets/icons/menu/accessibility.png'),
-                require('../../assets/icons/menu/food.png'),
-                require('../../assets/icons/menu/car.png'),
+                require('../../assets/icons/umum/food.png'),
+                require('../../assets/icons/umum/car.png'),
                 require('../../assets/icons/menu/design.png'),
                 require('../../assets/icons/menu/menu.png'),
             ],
@@ -82,33 +80,34 @@ export default class Dashboard extends Component {
     }
 
     componentDidMount() {
-        this._isMounted = true;
-        this.getLatestRequest();
+        this.hasMounted = true
+
         this.focusListener = [
             this.props.navigation.addListener('didFocus', () => {
-                this.getLatestRequest()
+                // this.getLatestRequest()
             }),
             this.props.navigation.addListener('willBlur', () => {
-                this.setState({latestRequest: null});
+                this.hasMounted && this.setState({latestRequest: null})
             })
-        ];
+        ]
     }
 
     componentWillUnmount() {
-        this._isMounted = false;
-        this.focusListener.forEach(listener => listener.remove());
+        this.hasMounted = false
+        this.focusListener.forEach(listener => listener.remove())
     }
 
     getLatestRequest = async () => {
         try {
-            this.setState({refreshing: true});
-            const nikSap = await AsyncStorage.getItem('nikSap');
-            let response = await fetch(host + 'api/getOrderInPok/' + nikSap + '/5');
-            response = await response.json();
-            this.setState({latestRequest: response, refreshing: false});
+            this.hasMounted && this.setState({refreshing: true})
+            const nikSap = await AsyncStorage.getItem('nikSap')
+            let response = await fetch(host + 'api/getOrderInPok/' + nikSap + '/5')
+            response = await response.json()
+            this.hasMounted && this.setState({latestRequest: response, refreshing: false})
         } catch (err) {
-            console.log(err);
-            alert('Gagal mendapatkan request terbaru, periksa koneksi internet anda');
+            console.log(err)
+            Alert.alert('Terjadi Kesalahan', 'Gagal mendapatkan request terbaru, periksa koneksi internet anda')
+            this.hasMounted && this.setState({refreshing: false})
         }
     }
     
@@ -118,13 +117,13 @@ export default class Dashboard extends Component {
 
             const prioritasBadgeBg = () => {
                 if (prioritas == 'E') {
-                    return style.bgAccent4;
+                    return style.bgAccent4
                 } else if (prioritas == '1') {
-                    return style.bgAccent2;
+                    return style.bgAccent2
                 } else if (prioritas == '2') {
-                    return style.bgAccent1;
+                    return style.bgAccent1
                 } else {
-                    return style.bgAccent3;
+                    return style.bgAccent3
                 }
             }
 
@@ -136,10 +135,10 @@ export default class Dashboard extends Component {
                     parseInt(requestDate[0]),
                     parseInt(requestDate[1]) - 1,
                     parseInt(requestDate[2])
-                );
+                )
                 let formattedDate = months[newDate.getMonth()] + " " + newDate.getDate() + ", " + newDate.getFullYear()
 
-                return formattedDate;
+                return formattedDate
             }
 
             return (
@@ -179,9 +178,9 @@ export default class Dashboard extends Component {
 
         const RefreshingIndicator = () => {
             if (this.state.refreshing) {
-                return (<ActivityIndicator size="large" />);
+                return (<ActivityIndicator size="large" />)
             } else {
-                return null;
+                return null
             }
         }
 
@@ -211,7 +210,7 @@ export default class Dashboard extends Component {
 							            placeholder="Cari berdasarkan deskripsi"
                                         returnKeyType="go"
                                         onSubmitEditing={() => {
-                                            this.setState({requestQuery: null})
+                                            this.hasMounted && this.setState({requestQuery: null})
                                             this.props.navigation.navigate('MyRequest', {}, NavigationActions.navigate({
                                                 routeName: 'MyRequest',
                                                 params: {
@@ -220,10 +219,10 @@ export default class Dashboard extends Component {
                                             }))}
                                         }
 							            autoCapitalize="none"
-							            onChangeText={(requestQuery) => this.setState({requestQuery})}
+							            onChangeText={(requestQuery) => this.hasMounted && this.setState({requestQuery})}
 							            value={this.state.requestQuery}
 							            placeholderTextColor="#d3d4cf" />
-						            <FeatherIcon name={'search'} style={s.inputIcon} />
+						            <Icon type='feather' name='search' containerStyle={s.inputIcon} color='#d3d4cf' size={18} />
                                 </View>
                             </View>
                             <Txt numberOfLines={2} style={s.headerText}>Buat Request Menjadi{"\n"}Lebih Mudah</Txt>
@@ -242,9 +241,9 @@ export default class Dashboard extends Component {
                                 <View style={s.bgOverlay} />
                                 <View style={s.bannerContent}>
                                     <Txt style={s.bannerText}>Cek request untukmu di sini</Txt>
-                                    <TouchableOpacity>
+                                    <TouchableOpacity onPress={() => Global.badgeCount.setState({count: 5})}>
                                         <View style={s.circleArrow}>
-                                            <FeatherIcon name={'arrow-right'} style={s.iconArrow} />
+                                            <Icon type='feather' name={'arrow-right'} containerStyle={s.iconArrow} style={{color: '#5794ff', fontSize: 24}} />
                                         </View>
                                     </TouchableOpacity>
                                 </View>
@@ -267,7 +266,7 @@ export default class Dashboard extends Component {
                                         if (!this.state.refreshing) {
                                             return (<Txt style={{marginLeft: 8}}>Tidak ada request</Txt>)
                                         } else {
-                                            return null;
+                                            return null
                                         }
                                     }}
                                     contentContainerStyle={{paddingHorizontal: 16,}}
@@ -373,8 +372,6 @@ const s = StyleSheet.create({
         top: 4
 	},
 	inputIcon: {
-		color: '#d3d4cf',
-		fontSize: 20,
 		position: 'absolute',
 		top: 13,
 		left: 24
@@ -425,8 +422,6 @@ const s = StyleSheet.create({
         alignSelf: 'center'
     },
     iconArrow: {
-        color: '#5794ff',
-		fontSize: 24,
         position: 'absolute',
         alignSelf: 'center',
         top: 8

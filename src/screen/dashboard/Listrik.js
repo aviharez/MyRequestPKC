@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {
     StyleSheet,
     View,
@@ -13,7 +13,7 @@ import Card from '../../component/Card';
 
 import {style} from '../../../assets/styles/Style';
 
-export default class Listrik extends Component {
+export default class Listrik extends React.PureComponent {
 
     _isMounted = false;
 

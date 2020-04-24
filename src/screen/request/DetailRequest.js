@@ -345,6 +345,7 @@ export default class DetailRequest extends Component {
                                             onChangeText={(keterangan) => this.setState({keterangan})}
                                             value={this.state.data.keterangan}
                                             style={{marginHorizontal: 8, textAlignVertical: 'top'}} />
+                                        <Txt style={s.keteranganHint}>Keterangan diisi hanya jika </Txt>
                                     </View>
                                 </View>
                             </View>

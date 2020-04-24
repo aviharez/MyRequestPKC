@@ -1,36 +1,58 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {
     StyleSheet,
     View,
     TouchableOpacity,
-    Image,
     ImageBackground,
     Alert,
 } from 'react-native';
-import {ListItem} from 'react-native-elements'
+import {ListItem, Badge} from 'react-native-elements'
+import {Txt, TxtBold} from '../../src/component/Text'
+import { Icon } from 'react-native-elements'
+import AsyncStorage from '@react-native-community/async-storage'
 
 import {style} from '../../assets/styles/Style'
-import {Txt, TxtBold} from '../../src/component/Text'
-import AsyncStorage from '@react-native-community/async-storage'
-import { Icon } from 'react-native-elements'
+import Global from '../config/Global'
 
-export default class Profile extends Component {
+export default class Profile extends React.PureComponent {
 
     constructor(props) {
         super(props)
 
         this.state = {
-            isUnitHead: null,
+            isParentPerson: false,
+            newRequestCount: 0,
         }
 
         this.getSession()
+        this.hasMounted = false
+    }
+
+    componentDidMount() {
+        this.hasMounted = true
+
+        this.focusListener = [
+            this.props.navigation.addListener('didFocus', () => {
+                this.hasMounted && this.setState({newRequestCount: Global.badgeCount.state.count})
+            }),
+            this.props.navigation.addListener('willBlur', () => {
+                // this.hasMounted ? this.setState({notificationCounter: 0}) : null
+            })
+        ]
+    }
+
+    componentWillUnmount() {
+        this.hasMounted = false
+
+        this.focusListener.forEach(listener => listener.remove())
     }
 
     getSession = async () => {
         let namaPegawai = await AsyncStorage.getItem('namaPegawai')
-        let posTitle = await AsyncStorage.getItem('posTitle')
-        let isUnitHead = await AsyncStorage.getItem('isUnitHead')
-        this.setState({namaPegawai: namaPegawai, posTitle: posTitle, isUnitHead: isUnitHead})
+        // let posTitle = await AsyncStorage.getItem('posTitle')
+        let parentName = await AsyncStorage.getItem('parentName')
+        let isParentPerson = await AsyncStorage.getItem('isParentPerson')
+        this.hasMounted && this.setState({namaPegawai: namaPegawai, parentName: parentName, isParentPerson: isParentPerson})
     }
 
     signOut = () => {
@@ -42,7 +64,7 @@ export default class Profile extends Component {
                 {
                     text: 'OK',
                     onPress: async () => {
-                        await AsyncStorage.multiRemove(['logged', 'nikSap', 'namaPegawai', 'unitId', 'isUnitHead'])
+                        await AsyncStorage.multiRemove(['logged', 'nikSap', 'namaPegawai', 'parentId', 'parentName', 'accessToken', 'isParentPerson'])
                         this.props.navigation.navigate('authCheck')
                     }
                 }
@@ -56,7 +78,7 @@ export default class Profile extends Component {
                 title: 'Persetujuan Request Order',
                 icon: 'check-square',
                 onPress: () => this.props.navigation.navigate('Approval'),
-                display: this.state.isUnitHead == 'yes' ? 'flex' : 'none'
+                display: this.state.isParentPerson == 'yes' ? 'flex' : 'none'
             }, {
                 title: 'Ubah Password',
                 icon: 'key',
@@ -87,7 +109,7 @@ export default class Profile extends Component {
                     <View style={s.contentContainer}>
                         <View style={s.profileDescContainer}>
                             <TxtBold style={s.name}>{ this.state.namaPegawai }</TxtBold>
-                            <Txt style={s.posTitle}>{ this.state.posTitle }</Txt>
+                            <Txt style={s.posTitle}>{ this.state.parentName }</Txt>
                         </View>
                         {
                             menu.map((item, index) => {
@@ -95,8 +117,15 @@ export default class Profile extends Component {
                                 return (
                                     <TouchableOpacity>
                                         <ListItem
-                                            keyExtractor={Math.floor(Math.random() * 1000000000)}
-                                            title={item.title}
+                                            key={index}
+                                            title={
+                                                index == 0 ? (
+                                                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                                        <TxtBold style={{fontSize: 14}}>{item.title}</TxtBold>
+                                                        {this.state.newRequestExist > 0 ? (<Badge status='error' value={this.state.newRequestCount} containerStyle={{position: 'absolute', right: 0}} />) : null}
+                                                    </View>
+                                                ) : (<TxtBold style={{fontSize: 14}}>{item.title}</TxtBold>)
+                                            }
                                             titleStyle={{fontFamily: 'Product Sans Bold', color: 'rgba(0, 0, 0, .6)'}}
                                             leftIcon={<Icon name={item.icon} type='feather' color='#5794ff' />}
                                             bottomDivider={bottomDivider}

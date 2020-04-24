@@ -1,13 +1,11 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {
     StyleSheet,
     View,
-    Text,
     TouchableOpacity,
     ScrollView,
     TextInput,
     ActivityIndicator,
-    Button,
     Dimensions,
     Picker,
     Platform,
@@ -28,7 +26,7 @@ import {host} from '../../config/ApiHost';
 const {width: WIDTH} = Dimensions.get('window');
 
 
-class RequestBtn extends Component {
+class RequestBtn extends React.PureComponent {
 	render() {
 		const {isProcessing, ...restProps} = this.props;
 		const requestText = () => {
@@ -51,7 +49,7 @@ class RequestBtn extends Component {
 	}
 }
 
-export default class FormPok extends Component {
+export default class FormPok extends React.PureComponent {
 
     constructor(props) {
         super(props);
@@ -136,7 +134,7 @@ export default class FormPok extends Component {
                     headers,
                     body: JSON.stringify(message)
                 })
-                fcmResponse = fcmResponse.json()
+                fcmResponse = await fcmResponse.json()
                 console.log(fcmResponse)
 
                 this.setState({isProcessing: false})

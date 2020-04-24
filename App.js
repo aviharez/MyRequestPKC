@@ -1,20 +1,20 @@
-import React, { Component } from 'react';
+import React from 'react'
 import {
     StyleSheet,
-    TextInput,
-    TouchableOpacity,
-	  View,
+	View,
     ImageBackground,
-	  Image,
-	  ActivityIndicator,
-} from 'react-native';
+	Image,
+	ActivityIndicator,
+	BackHandler,
+	ToastAndroid,
+} from 'react-native'
 import {
     createSwitchNavigator,
     createAppContainer
 } from 'react-navigation'
+import 'react-native-gesture-handler'
 import AsyncStorage from '@react-native-community/async-storage'
-import firebase from '@react-native-firebase/app'
-import messaging from '@react-native-firebase/messaging'
+import {firebase} from '@react-native-firebase/messaging'
 
 import bg from './assets/images/brainstorming-campaign-collaborate-6224.jpg'
 import logo from './assets/images/logo.png'
@@ -23,12 +23,11 @@ import {Txt} from './src/component/Text'
 import loginScreen from './src/screen/Login.js'
 import routerScreen from './src/Router.js'
 
-class AuthLoadingScreen extends Component {
+class AuthLoadingScreen extends React.PureComponent {
     constructor(props) {
-		super(props);
+		super(props)
 		
 		this.checkPermission()
-		this._loadData()
 		this.notificationListener()
 	}
 
@@ -53,28 +52,43 @@ class AuthLoadingScreen extends Component {
 	}
 
 	getToken = async () => {
-		let fcmToken = await AsyncStorage.getItem('fcmToken');
+		let savedFcmToken = await AsyncStorage.getItem('fcmToken')
 
-		if (!fcmToken) {
-			fcmToken = await firebase.messaging().getToken();
+		try {
+			ToastAndroid.show('Requesting notification token', ToastAndroid.SHORT)
+			let fcmToken = await firebase.messaging().getToken()
 
-			if (fcmToken) {
+			if (fcmToken != savedFcmToken) {
 				// User has device token
-				await AsyncStorage.setItem('fcmToken', fcmToken);
+				await AsyncStorage.setItem('fcmToken', fcmToken)
+				ToastAndroid.show('New notification token saved', ToastAndroid.SHORT)
 			}
+			
+			this._loadData()
+		} catch (err) {
+			Alert.alert(
+				'Terjadi Kesalahan',
+				'Request token gagal, kemungkinan: \n'+
+				'Akses ke server token terblokir atau gagal menghubungkan. \n'+
+				'Silakan periksa kembali koneksi internet anda.',
+				[
+					{
+						text: 'OK',
+						onPress: () => BackHandler.exitApp()
+					}
+				]
+			)
 		}
-
-		console.log(await AsyncStorage.getItem('fcmToken'))
 	}
 
 	requestPermission = async () => {
 		try {
-			await firebase.messaging().requestPermission();
+			await firebase.messaging().requestPermission()
 
 			// User authorized
-			this.getToken();
+			this.getToken()
 		} catch (err) {
-			console.log('Permission rejected');
+			console.log('Permission rejected')
 		}
 	}
 
@@ -90,12 +104,12 @@ class AuthLoadingScreen extends Component {
 					<Txt style={{color: '#fff', fontSize: 18}}>Menghubungkan</Txt>
 				</View>
 			</ImageBackground>
-        );
+        )
     }
 
     _loadData = async () => {
-        const logged = await AsyncStorage.getItem('logged');
-        this.props.navigation.navigate(logged ? 'app' : 'auth');
+        const logged = await AsyncStorage.getItem('logged')
+        this.props.navigation.navigate(logged ? 'app' : 'auth')
     }
 }
 
@@ -130,7 +144,7 @@ const s = StyleSheet.create({
 		width: 96,
 		height: 96
 	},
-});
+})
 
 export default createAppContainer(createSwitchNavigator({
     authCheck: AuthLoadingScreen,
@@ -139,4 +153,4 @@ export default createAppContainer(createSwitchNavigator({
 },
 {
     initialRouteName: 'authCheck'
-}));
+}))

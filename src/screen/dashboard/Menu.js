@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {
     StyleSheet,
     View,
@@ -14,7 +14,7 @@ import {Txt} from '../../component/Text';
 
 import {style} from '../../../assets/styles/Style';
 
-export default class Menu extends Component {
+export default class Menu extends React.PureComponent {
 
     _isMounted = false;
 
@@ -72,28 +72,28 @@ export default class Menu extends Component {
             ],
 
             nonTitle: [
-                'Konsumsi',
-                'Pinjam Kendaraan',
-                'Wisma/BQ',
-                'Ruang Rapat',
-                'Perbaikan Kendaraan',
-                'ATK'
+                'Accomodation',
+                'Venue',
+                'Transportation',
+                'Food & Beverage',
+                // 'Perbaikan Kendaraan',
+                // 'ATK'
             ],
             nonIcon: [
-                require('../../../assets/icons/menu/food.png'),
-                require('../../../assets/icons/menu/car.png'),
-                require('../../../assets/icons/bengkel/pertukangan.png'),
-                require('../../../assets/icons/bengkel/permesinan.png'),
-                require('../../../assets/icons/bengkel/perpipaan.png'),
-                require('../../../assets/icons/menu/design.png'),
+                require('../../../assets/icons/umum/accomodation.png'),
+                require('../../../assets/icons/umum/meeting_room.png'),
+                require('../../../assets/icons/umum/car.png'),
+                require('../../../assets/icons/umum/food.png'),
+                // require('../../../assets/icons/bengkel/perpipaan.png'),
+                // require('../../../assets/icons/menu/design.png'),
             ],
             nonNav: [
-                'Konsumsi',
-                'Pinjam Kendaraan',
-                'Wisma/BQ',
-                'Ruang Rapat',
-                'Perbaikan Kendaraan',
-                'ATK'
+                'FormAccomodation',
+                'FormVenue',
+                'FormTransportation',
+                'FormFoodBeverage',
+                // 'Perbaikan Kendaraan',
+                // 'ATK'
             ],
 
             refreshing: false,
@@ -153,14 +153,14 @@ export default class Menu extends Component {
                             <View style={{marginTop: 24}}>
                                 <View style={s.headerSearchbar}>
                                     <View style={s.requestSignTitle}/>
-                                    <Txt style={s.requestTitle}>Permintaan Order Kerja</Txt>
+                                    <Txt style={s.requestTitle}>Permintaan Order Kerja (POK)</Txt>
                                 </View>
                                 <View style={s.categoryColContainer}>
                                     {PokTiles}
                                 </View>
                                 <View style={s.headerSearchbar}>
                                     <View style={s.requestSignTitle}/>
-                                    <Txt style={s.requestTitle}>Non POK</Txt>
+                                    <Txt style={s.requestTitle}>Non POK (Umum)</Txt>
                                 </View>
                                 <View style={s.categoryColContainer}>
                                     {NonTiles}
@@ -200,6 +200,7 @@ const s = StyleSheet.create({
     headerSearchbar: {
         flex: 1,
         flexDirection: 'row',
+        alignItems: 'center'
     },
     contentContainer: {
         padding: 16,
@@ -238,12 +239,11 @@ const s = StyleSheet.create({
         width: 6,
         height: 18,
         borderRadius: 16,
-        left: 16
+        marginLeft: 8
     },
     requestTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        left: 24,
-        top: -2
+        marginLeft: 8,
     }
 })

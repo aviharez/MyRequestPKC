@@ -1,9 +1,7 @@
 // Component import
-import React, { Component } from 'react';
+import React from 'react'
 import {
 	View,
-	Button,
-	ScrollView,
 	TextInput,
 	StyleSheet,
 	Image,
@@ -13,35 +11,28 @@ import {
 	TouchableOpacity,
 	ImageBackground,
 	ActivityIndicator,
-	StatusBar,
 	ToastAndroid,
-} from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
-import {createStackNavigator} from 'react-navigation-stack';
-
+	Alert,
+} from 'react-native'
+import AsyncStorage from '@react-native-community/async-storage'
 
 // Resource import
-import logo from '../../assets/images/logo.png';
-import bg from '../../assets/images/brainstorming-campaign-collaborate-6224.jpg';
-import Icon from 'react-native-vector-icons/Ionicons';
-import {Txt, TxtBold} from '../component/Text';
-import {host} from '../config/ApiHost';
+import logo from '../../assets/images/logo.png'
+import bg from '../../assets/images/brainstorming-campaign-collaborate-6224.jpg'
+import Icon from 'react-native-vector-icons/Ionicons'
+import {Txt, TxtBold} from '../component/Text'
+import {host} from '../config/ApiHost'
 
-// Page import
-import Router from '../Router.js';
-import { createAppContainer } from 'react-navigation';
+const {width: WIDTH} = Dimensions.get('window')
 
-
-const {width: WIDTH} = Dimensions.get('window');
-
-class SignInBtn extends Component {
+class SignInBtn extends React.PureComponent {
 	render() {
-		const {signInStatus, ...restProps} = this.props;
+		const {signInStatus, ...restProps} = this.props
 		const signInText = () => {
 			if (signInStatus == 'processing') {
-				return (<ActivityIndicator size="large" color='white' style={{marginVertical: 4}} />);
+				return (<ActivityIndicator size='large' color='white' style={{marginVertical: 4}} />)
 			} else {
-				return (<TxtBold style={s.signInBtnTxt}>Sign In</TxtBold>);
+				return (<TxtBold style={s.signInBtnTxt}>Sign In</TxtBold>)
 			}
 		}
 
@@ -52,16 +43,16 @@ class SignInBtn extends Component {
 						{signInText()}
 					</View>
 				</TouchableNativeFeedback>
-			);
+			)
 		}
 	}
 }
 
-export default class LoginPage extends Component {
-	_isMounted = false;
+export default class LoginPage extends React.PureComponent {
+	_isMounted = false
 
 	constructor(props) {
-		super(props);
+		super(props)
 
 		this.state = {
 			isPasswordVisible: false,
@@ -72,11 +63,11 @@ export default class LoginPage extends Component {
 	}
 
 	componentDidMount() {
-		this._isMounted = true;
+		this._isMounted = true
 	}
 
 	componentWillUnmount() {
-		this._isMounted = false;
+		this._isMounted = false
 	}
 
 	static navigationOption = {
@@ -85,75 +76,103 @@ export default class LoginPage extends Component {
 
 	proceedLogin = async () => {
 		if ((this.state.username == '' || this.state.username == null) || (this.state.password == '' || this.state.password == null)) {
-			alert('Username atau password belum diisi');
-			return;
+			ToastAndroid.show('Harap isi username dan password anda', ToastAndroid.SHORT)
+			return
+		}
+
+		var token = await AsyncStorage.getItem('fcmToken')
+		if (!token || token == '') {
+			ToastAndroid.show('Token notifikasi tidak ditemukan, silakan mulai ulang aplikasi.', ToastAndroid.SHORT)
+			return
 		}
 
 		try {
-			this.setState({signInStatus: 'processing'});
-			let response = await fetch(host + 'api/auth', {
-				method: "POST",
+			this.setState({signInStatus: 'processing'})
+			let signInData = {
+                'username': this.state.username,
+                'password': this.state.password
+            }
+            let formData = []
+            for (let property in signInData) {
+                let encodedKey = encodeURIComponent(property)
+                let encodedValue = encodeURIComponent(signInData[property])
+    
+                formData.push(encodedKey + '=' + encodedValue)
+            }
+			formData = formData.join('&')
+			
+			let response = await fetch('http://wbs.pupuk-kujang.co.id:8081/hrdmobile/app/login-v2/', {
+				method: 'POST',
 				headers: {
-					"Content-Type": "application/json"
+					'Content-Type': 'application/x-www-form-urlencoded'
 				},
-				body: JSON.stringify({
-					nikSap: this.state.username,
-					password: this.state.password,
-				})
-			});
-			response = await response.json();
+				body: formData
+			})
+			response = await response.json()
 
-			if (response.status == 'success') {
-				const fcmToken = await AsyncStorage.getItem('fcmToken')
-				let tokenResponse = await fetch(host + "api/submitDeviceToken", {
-					method: "POST",
-					body: JSON.stringify({
-						"deviceToken": fcmToken,
-						"nikSap": this.state.username
-					})
-				});
-
-				tokenResponse = await tokenResponse.json();
-				message = null;
-				if (tokenResponse.status == 'tokenValid') {
-					message = "Token valid";
-				} else if (tokenResponse.status == 'insertSuccess') {
-					message = "Device token saved";
-				} else if (tokenResponse.status == 'nikSapUpdated') {
-					message = 'Token is already exist, old nikSap replaced';
-				} else {
-					message = 'Something went wrong when processing device token';
-				}
-				ToastAndroid.show(message, ToastAndroid.SHORT);
+			if (response.success == true) {
+				this.submitToken(token)
 
 				await AsyncStorage.multiSet([
 					['logged', 'yes'],
-					['nikSap', response.nikSap],
-					['namaPegawai', response.namaPegawai],
-					['unitId', response.unitId],
-					['posTitle', response.posTitle],
-					['isUnitHead', response.isUnitHead]
-				]);
-				this.props.navigation.navigate('app');
-			} else if (response.status == 'wrongNikSap') {
-				alert('Nik SAP anda salah, silakan periksa kembali');
-				this.setState({username: null});
-			} else if (response.status == 'wrongPassword') {
-				alert('Password anda salah, silakan periksa kembali');
-				this.setState({password: null});
+					['nikSap', response.user.EMPLOYEEID],
+					['namaPegawai', response.user.EMPLOYEENAME],
+					['parentId', response.user.PARENTID],
+					['parentName', response.user.PARENTNAME],
+					['isParentPerson', response.user.PARENTPERSON ? 'yes' : 'no'],
+					['accessToken', response.access_token]
+				])
+				this.props.navigation.navigate('app')
+			} else if (response.error) {
+				Alert.alert('Login Gagal', response.error.message)
 			}
 		} catch (err) {
 			console.log(err)
-			alert('Gagal memproses login, silakan periksa koneksi internet anda');
+			Alert.alert('Terjadi Kesalahan', 'Gagal memproses login, silakan periksa koneksi internet anda')
 		}
 
 		if (this._isMounted) {
-			this.setState({signInStatus: 'default'});
+			this.setState({signInStatus: 'default'})
+		}
+	}
+
+	submitToken = async token => {
+		try {
+			let tokenData = {
+                'token': token,
+                'employee_id': this.state.username
+            }
+            let data = []
+            for (let property in tokenData) {
+                let encodedKey = encodeURIComponent(property)
+                let encodedValue = encodeURIComponent(tokenData[property])
+    
+                data.push(encodedKey + '=' + encodedValue)
+            }
+			data = data.join('&')
+
+			let response = await fetch(`${host}api/token-submit`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded'
+				},
+				body: data
+			})
+			response = await response.json()
+
+			if (!response.success) {
+				ToastAndroid.show('Gagal menyimpan token ke server, silakan hubungi administrator', ToastAndroid.SHORT)
+				return false
+			}
+		} catch (err) {
+			console.log(err)
+			ToastAndroid.show('Terjadi kesalahan', ToastAndroid.SHORT)
+			return false
 		}
 	}
 
 	render() {
-		const {navigate} = this.props.navigation;
+		const {navigate} = this.props.navigation
 
 		return (
 			<ImageBackground source={bg} style={s.mainContainer}>
@@ -168,23 +187,23 @@ export default class LoginPage extends Component {
 					<View style={s.textInputContainer}>
 						<TextInput
 							style={s.textInput}
-							placeholder="Username"
-							autoCapitalize="none"
+							placeholder='Username'
+							autoCapitalize='none'
 							onChangeText={(username) => this.setState({username})}
 							value={this.state.username}
-							placeholderTextColor="rgba(51, 51, 51, 0.8)'" />
+							placeholderTextColor='rgba(51, 51, 51, 0.8)' />
 						<Icon name={Platform.OS === 'android' ? 'md-person' : 'ios-person' } style={s.inputIcon} />
 					</View>
 
 					<View style={s.textInputContainer}>
 						<TextInput
 							style={s.textInput}
-							placeholder="Password"
+							placeholder='Password'
 							onChangeText={(password) => this.setState({password})}
 							value={this.state.password}
-							autoCapitalize="none"
+							autoCapitalize='none'
 							secureTextEntry={this.state.isPasswordVisible == true ? false : true}
-							placeholderTextColor="rgba(51, 51, 51, 0.9)'" />
+							placeholderTextColor='rgba(51, 51, 51, 0.9)' />
 						<Icon name={Platform.OS === 'android' ? 'md-key' : 'ios-key' } style={s.inputIcon} />
 						<TouchableOpacity style={s.showHidePassword} onPress={() => {
 							this.setState({isPasswordVisible: !this.state.isPasswordVisible})
@@ -205,7 +224,7 @@ export default class LoginPage extends Component {
 					<SignInBtn onPress={this.proceedLogin} signInStatus={this.state.signInStatus} />
 				</View>
 			</ImageBackground>
-		);
+		)
 	}
 	
 }
@@ -284,4 +303,4 @@ const s = StyleSheet.create({
 		top: 13,
 		right: 14,
 	}
-});
+})

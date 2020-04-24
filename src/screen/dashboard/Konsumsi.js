@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {
     StyleSheet,
     View,
@@ -7,7 +7,7 @@ import {
 
 import {style} from '../../../assets/styles/Style';
 
-export default class Konsumsi extends Component {
+export default class Konsumsi extends React.PureComponent {
     render() {
         return (
             <View style={[style.mainContainer]}>

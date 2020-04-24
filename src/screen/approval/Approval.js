@@ -1,26 +1,23 @@
-import React, {Component} from 'react';
+import React from 'react'
 import {
     StyleSheet,
     View,
-    Text,
     TouchableOpacity,
-    ScrollView,
     Dimensions,
     Image,
-    ActivityIndicator,
     FlatList,
-} from 'react-native';
+} from 'react-native'
+import {Txt} from '../../component/Text'
+import {Icon} from 'react-native-elements'
+import AsyncStorage from '@react-native-community/async-storage'
 
-import {style} from '../../../assets/styles/Style';
+import {style} from '../../../assets/styles/Style'
 
-import {Txt} from '../../component/Text';
-import Icon from 'react-native-vector-icons/Feather';
-import AsyncStorage from '@react-native-community/async-storage';
 import {host} from '../../config/ApiHost'
 
 const { width } = Dimensions.get("window")
 
-export default class Approval extends Component {
+export default class Approval extends React.PureComponent {
 
     constructor(props) {
         super(props)
@@ -37,13 +34,13 @@ export default class Approval extends Component {
                 this.getUnapproved()
             }),
             this.props.navigation.addListener('willBlur', () => {
-                this.setState({data: null});
+                this.setState({data: null})
             })
-        ];
+        ]
     }
 
     componentWillUnmount() {
-        this.focusListener.forEach(listener => listener.remove());
+        this.focusListener.forEach(listener => listener.remove())
     }
 
     getUnapproved = async () => {
@@ -68,13 +65,13 @@ export default class Approval extends Component {
 
             const prioritasBadgeBg = () => {
                 if (prioritas == 'E') {
-                    return style.bgAccent4;
+                    return style.bgAccent4
                 } else if (prioritas == '1') {
-                    return style.bgAccent2;
+                    return style.bgAccent2
                 } else if (prioritas == '2') {
-                    return style.bgPrimary;
+                    return style.bgPrimary
                 } else if (prioritas == '3') {
-                    return style.bgAccent1;
+                    return style.bgAccent1
                 }
             }
 
@@ -90,19 +87,19 @@ export default class Approval extends Component {
                     parseInt(requestDate[0]),
                     parseInt(requestDate[1]) - 1,
                     parseInt(requestDate[2])
-                );
+                )
                 let formattedDate = months[newDate.getMonth()] + " " + newDate.getDate() + ", " + newDate.getFullYear()
 
-                return formattedDate;
+                return formattedDate
             }
 
             return (
                 <TouchableOpacity onPress={() => this.props.navigation.navigate('DetailRequest', {orderId: parseInt(id)})}>
                     <View style={{ flexDirection: 'column', backgroundColor: '#fff', padding: 8 }}>
-                        <View style={{ flexDirection: 'row' }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                             <Image source={require('../../../assets/icons/user.png')} style={{width: 40, height: 40, tintColor: '#5794ff'}} />
                             <View style={{ flexDirection: 'column', marginLeft: 8,}}>
-                                <Txt style={{ color: '#000', fontSize: 16, maxWidth: 140}} numberOfLines={1}>{name}</Txt>
+                                <Txt style={{ color: '#000', fontSize: 16, maxWidth: 180}} numberOfLines={1}>{name}</Txt>
                                 <Txt style={{ color: '#cccbc7', fontSize: 13}}>{dateFormat(date)}</Txt>
                             </View>
                             <View style={[prioritasBadgeBg(), {
@@ -112,15 +109,15 @@ export default class Approval extends Component {
                                 height: 20,
                                 width: 20,
                                 marginLeft: 8,
-                                marginTop: 4
+                                marginTop: -14
                             }]}>
                                 <Txt style={{ color: '#fff' }}>{prioritas}</Txt>
                             </View>
                         </View>
                         <View style={{ flexDirection: 'column', marginStart: 48 }}>
                             <Txt numberOfLines={2} style={{ fontSize: 15 }}>{deskripsi}</Txt>
-                            <View style={{ flexDirection: 'row', marginTop: 8 }}>
-                                <Icon name={'target'} style={{ height: 14, width: 14, color: '#cccbc7'}} />
+                            <View style={{ flexDirection: 'row', marginTop: 8, alignItems: 'center' }}>
+                                <Icon name={'target'} type='feather' size={14} color='#cccbc7' />
                                 <Txt style={{ fontSize: 12, color: '#cccbc7', marginLeft: 2 }}>{unitName}</Txt>
                             </View>
                         </View>
@@ -133,12 +130,12 @@ export default class Approval extends Component {
 
         return (
             <View style={[style.mainContainer]}>
-                <View style={{ flexDirection: 'row', marginVertical: 8, padding: 16 }}>
+                <View style={{ flexDirection: 'row', marginVertical: 8, padding: 16, alignItems: 'center' }}>
                     <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                        <Icon name={'chevron-left'} style={{ fontSize: 24, alignSelf: 'center' }} />
+                        <Icon name={'chevron-left'} style={{ fontSize: 18}} />
                     </TouchableOpacity>
                     <Txt style={{ 
-                        fontSize: 24,
+                        fontSize: 18,
                         color: '#333',
                         fontWeight: 'bold',
                         alignSelf: 'center'

@@ -1,1 +1,1 @@
-export const host = "https://pkc-request.000webhostapp.com/";
+export const host = "http://192.168.100.22/portalRequestPkc/";

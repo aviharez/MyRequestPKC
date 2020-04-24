@@ -1,23 +1,18 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {
     StyleSheet,
     View,
-    Text,
     ScrollView,
     TouchableOpacity,
-    Image
 } from 'react-native';
 
 import {ListItem} from 'react-native-elements';
 
-import Icon from 'react-native-vector-icons/Feather';
-import Card from '../component/Card';
-
 import {style} from '../../assets/styles/Style';
 
-import {Txt, TxtBold} from '../component/Text'; 
+import {TxtBold} from '../component/Text'; 
 
-export default class Notification extends Component {
+export default class Notification extends React.PureComponent {
 
     _isMounted = false;
 
@@ -68,7 +63,7 @@ export default class Notification extends Component {
                                         return (
                                             <TouchableOpacity>
                                                 <ListItem
-                                                    key={index}
+                                                    key={Math.random()}
                                                     title={item.title}
                                                     titleStyle={{fontFamily: 'Product Sans Bold', fontSize: 14, color: 'rgba(0, 0, 0, .6)', marginLeft: -8}}
                                                     subtitle={item.date}

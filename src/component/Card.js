@@ -1,12 +1,12 @@
-import React, {Component} from 'react';
+import React from 'react'
 import {
     StyleSheet,
     View
-} from 'react-native';
+} from 'react-native'
 
-export default class Card extends Component {
+export default class Card extends React.PureComponent {
     render() {
-        const {style, ...restProps} = this.props;
+        const {style, ...restProps} = this.props
         return (
             <View style={[s.card, style]} {...this.restProps}>
                 {this.props.children}

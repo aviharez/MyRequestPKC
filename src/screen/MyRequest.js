@@ -4,12 +4,9 @@ import {
     Text,
     TouchableOpacity,
     Animated,
-    ScrollView,
     Image,
     Dimensions,
     FlatList,
-    TouchableNativeFeedback,
-    ActivityIndicator,
     StyleSheet,
 } from 'react-native'
 import {Icon} from 'react-native-elements'
@@ -21,7 +18,7 @@ import {host} from '../../src/config/ApiHost'
 
 const { width } = Dimensions.get('window')
 
-export default class MyRequest extends React.Component {
+export default class MyRequest extends React.PureComponent {
 
     _isMounted = false;
 
@@ -236,7 +233,7 @@ export default class MyRequest extends React.Component {
                 return (
                     <View style={{justifyContent: 'flex-start', flexDirection: 'row'}}>
                         <View style={s.searchBadge}>
-                            <Text style={{color: '#666'}}>{this.props.navigation.getParam('q')}</Text>
+                            <Txt style={{color: '#666'}}>{this.props.navigation.getParam('q')}</Txt>
                             <TouchableOpacity onPress={() => removeParam()}>
                                 <Icon
                                     name='x'
@@ -328,13 +325,13 @@ export default class MyRequest extends React.Component {
                                 )
                             }
                         >
-                            <Text
+                            <Txt
                                 style={{
                                     color: active === 0 ? '#fff' : '#007aff'
                                 }}
                             >
-                                Keluar
-                            </Text>
+                                Masuk
+                            </Txt>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={{
@@ -359,13 +356,13 @@ export default class MyRequest extends React.Component {
                                 )
                             }
                         >
-                            <Text
+                            <Txt
                                 style={{
                                     color: active === 1 ? '#fff' : '#007aff'
                                 }}
                             >
-                                Masuk
-                            </Text>
+                                Keluar
+                            </Txt>
                         </TouchableOpacity>
                     </View>
                     <SearchBadge/>
@@ -389,9 +386,9 @@ export default class MyRequest extends React.Component {
                         }
                     >
                         <FlatList
-                            data={this.state.outcomingRequest}
+                            data={this.state.incomingRequest}
                             renderItem={
-                                ({item}) => <RequestList name={item.namaPegawai} deskripsi={item.deskripsi} prioritas={item.prioritas} date={item.tanggal} unitName={item.namaSubKategori} status={item.status} id={item.idOrderPok} viewOnly={true} />
+                                ({item}) => <RequestList name={item.namaPegawai} deskripsi={item.deskripsi} prioritas={item.prioritas} date={item.tanggal} unitName={item.unitName} status={item.status} id={item.idOrderPok} viewOnly={false} />
                             }
                             refreshing={this.state.refreshing}
                             onRefresh={() => {
@@ -400,7 +397,7 @@ export default class MyRequest extends React.Component {
                                 })
                             }}
                             keyExtractor={item => item.idOrderPok}
-                            contentContainerStyle={{}} />
+                            ListEmptyComponent={() => <View style={{paddingHorizontal: 24}}><Txt>Tidak ada request</Txt></View>} />
                     </Animated.View>
 
                     <Animated.View
@@ -418,9 +415,9 @@ export default class MyRequest extends React.Component {
                         }}
                     >
                         <FlatList
-                            data={this.state.incomingRequest}
+                            data={this.state.outcomingRequest}
                             renderItem={
-                                ({item}) => <RequestList name={item.namaPegawai} deskripsi={item.deskripsi} prioritas={item.prioritas} date={item.tanggal} unitName={item.unitName} status={item.status} id={item.idOrderPok} viewOnly={false} />
+                                ({item}) => <RequestList name={item.namaPegawai} deskripsi={item.deskripsi} prioritas={item.prioritas} date={item.tanggal} unitName={item.namaSubKategori} status={item.status} id={item.idOrderPok} viewOnly={true} />
                             }
                             refreshing={this.state.refreshing}
                             onRefresh={() => {
@@ -429,7 +426,7 @@ export default class MyRequest extends React.Component {
                                 })
                             }}
                             keyExtractor={item => item.idOrderPok}
-                            contentContainerStyle={{}} />
+                            ListEmptyComponent={() => <View style={{paddingHorizontal: 24}}><Txt>Tidak ada request</Txt></View>} />
                     </Animated.View>
                 </View>
                 
